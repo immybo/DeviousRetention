@@ -1,4 +1,5 @@
 import model.Board;
+import model.Client;
 import model.Tile;
 import model.World;
 import model.tile.GrassTile;
@@ -17,20 +18,9 @@ public class Main {
         });
         World world = new World(board);
 
-        JFrame frame = new JFrame();
-        JPanel panel = new JPanel() {
-            @Override
-            public void paint(Graphics g) {
-                super.paint(g);
-                world.renderOn(g);
-            }
-        };
-
-        frame.add(panel);
-        frame.setMinimumSize(new Dimension(500, 500));
-        frame.pack();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        frame.repaint();
+        Client client = new Client(World.NULL_WORLD);
+        Server server = new Server(world);
+        server.addClient(client);
+        server.updateClients();
     }
 }

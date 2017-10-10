@@ -1,5 +1,7 @@
 package model;
 
+import java.awt.*;
+
 /**
  * Represents the background tiles in the world.
  * These tiles are both cosmetic and can have collision properties.
@@ -28,5 +30,19 @@ public class Board {
 
     public int getHeight() {
         return height;
+    }
+
+    public void renderOn(Graphics g) {
+        double tileWidth = 50; //(g.getClipBounds().width+0.0) / width;
+        double tileHeight = 50; //(g.getClipBounds().height+0.0) / height;
+        for (int i = 0; i < getWidth(); i++) {
+            for (int j = 0; j < getHeight(); j++) {
+                // Tile tile = getTile(i, j);
+                g.setColor(Color.GREEN);
+                g.fillRect((int)(tileWidth*i), (int)(tileHeight*j), (int)tileWidth, (int)tileHeight);
+                g.setColor(Color.BLACK);
+                g.drawRect((int)(tileWidth*i), (int)(tileHeight*j), (int)tileWidth, (int)tileHeight);
+            }
+        }
     }
 }
