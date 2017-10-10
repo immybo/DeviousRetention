@@ -1,5 +1,6 @@
 package model;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,5 +19,10 @@ public class World {
 
     public Board getBoard() {
         return board;
+    }
+
+    public void renderOn(Graphics g) {
+        g.setColor(Color.GREEN);
+        g.fillRect(0, 0, g.getClipBounds().width, g.getClipBounds().height);
     }
 }
