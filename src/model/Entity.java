@@ -61,7 +61,7 @@ public abstract class Entity {
         g.setColor(Color.WHITE);
         g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
         g.setColor(Color.BLACK);
-        g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
-        g.drawString(this.getClass().getCanonicalName(), topLeft.x + 10, topLeft.y + 10);
+        g.drawRect(topLeft.x, topLeft.y, size.x, size.y);
+        g.drawString(this.getClass().getCanonicalName(), topLeft.x + 10, topLeft.y + 50);
     }
 }

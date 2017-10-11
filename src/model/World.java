@@ -22,6 +22,10 @@ public class World {
         this.entities = new ArrayList<Entity>();
     }
 
+    public void addEntity(Entity entity) {
+        this.entities.add(entity);
+    }
+
     public Board getBoard() {
         return board;
     }
