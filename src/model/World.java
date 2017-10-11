@@ -36,4 +36,10 @@ public class World {
             e.renderOn(g, translation);
         }
     }
+
+    public void tick() {
+        for (Entity e : entities) {
+            e.tick(this);
+        }
+    }
 }

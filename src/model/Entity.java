@@ -64,4 +64,8 @@ public abstract class Entity {
         g.drawRect(topLeft.x, topLeft.y, size.x, size.y);
         g.drawString(this.getClass().getCanonicalName(), topLeft.x + 10, topLeft.y + 50);
     }
+
+    public void tick(World world) {
+
+    }
 }
