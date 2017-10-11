@@ -1,6 +1,7 @@
 package model;
 
 import model.tile.GrassTile;
+import util.CoordinateTranslation;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -25,7 +26,10 @@ public class World {
         return board;
     }
 
-    public void renderOn(Graphics g) {
-        board.renderOn(g);
+    public void renderOn(Graphics g, CoordinateTranslation translation) {
+        board.renderOn(g, translation);
+        for (Entity e : entities) {
+            e.renderOn(g, translation);
+        }
     }
 }

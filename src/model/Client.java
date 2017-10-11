@@ -1,6 +1,7 @@
 package model;
 
 import network.STCConnection;
+import util.CoordinateTranslation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +19,9 @@ public class Client implements STCConnection {
             @Override
             public void paint(Graphics g) {
                 super.paint(g);
-                getWorld().renderOn(g);
+                int worldWidth = getWorld().getBoard().getWidth();
+                int worldHeight = getWorld().getBoard().getHeight();
+                getWorld().renderOn(g, new CoordinateTranslation(0, 0, getWidth()/worldWidth, getHeight()/worldHeight));
             }
         };
 

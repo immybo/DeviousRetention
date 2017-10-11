@@ -1,5 +1,9 @@
 package model;
 
+import util.CoordinateTranslation;
+
+import java.awt.*;
+
 /**
  * Something on the layer above tiles, can be interacted with by other entities.
  */
@@ -49,5 +53,15 @@ public abstract class Entity {
         } else if (getY() - size > board.getHeight() - 1) {
             this.y = board.getHeight() - 1 - size;
         }
+    }
+
+    public void renderOn(Graphics g, CoordinateTranslation translation) {
+        Point topLeft = translation.getTransformedPoint(new Point.Double(getX(), getY()));
+        Point size = translation.getTransformedPoint(new Point.Double(getSize(), getSize()));;
+        g.setColor(Color.WHITE);
+        g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
+        g.setColor(Color.BLACK);
+        g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
+        g.drawString(this.getClass().getCanonicalName(), topLeft.x + 10, topLeft.y + 10);
     }
 }

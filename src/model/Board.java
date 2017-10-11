@@ -1,5 +1,7 @@
 package model;
 
+import util.CoordinateTranslation;
+
 import java.awt.*;
 
 /**
@@ -32,16 +34,17 @@ public class Board {
         return height;
     }
 
-    public void renderOn(Graphics g) {
-        double tileWidth = 50; //(g.getClipBounds().width+0.0) / width;
-        double tileHeight = 50; //(g.getClipBounds().height+0.0) / height;
+    public void renderOn(Graphics g, CoordinateTranslation translation) {
+        Point size = translation.getTransformedPoint(new Point.Double(1, 1));
+
         for (int i = 0; i < getWidth(); i++) {
             for (int j = 0; j < getHeight(); j++) {
                 // Tile tile = getTile(i, j);
+                Point topLeft = translation.getTransformedPoint(new Point.Double(i, j));
                 g.setColor(Color.GREEN);
-                g.fillRect((int)(tileWidth*i), (int)(tileHeight*j), (int)tileWidth, (int)tileHeight);
+                g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
                 g.setColor(Color.BLACK);
-                g.drawRect((int)(tileWidth*i), (int)(tileHeight*j), (int)tileWidth, (int)tileHeight);
+                g.drawRect(topLeft.x, topLeft.y, size.x, size.y);
             }
         }
     }
