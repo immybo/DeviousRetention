@@ -26,6 +26,10 @@ public class World {
         this.entities.add(entity);
     }
 
+    public Entity[] getEntities() {
+        return entities.toArray(new Entity[0]);
+    }
+
     public Board getBoard() {
         return board;
     }

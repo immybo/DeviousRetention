@@ -35,12 +35,12 @@ public class Board {
     }
 
     public void renderOn(Graphics g, CoordinateTranslation translation) {
-        Point size = translation.getTransformedPoint(new Point.Double(1, 1));
+        Point size = translation.toScreenCoordinates(new Point.Double(1, 1));
 
         for (int i = 0; i < getWidth(); i++) {
             for (int j = 0; j < getHeight(); j++) {
                 // Tile tile = getTile(i, j);
-                Point topLeft = translation.getTransformedPoint(new Point.Double(i, j));
+                Point topLeft = translation.toScreenCoordinates(new Point.Double(i, j));
                 g.setColor(Color.GREEN);
                 g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
                 g.setColor(Color.BLACK);

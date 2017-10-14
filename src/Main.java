@@ -15,7 +15,7 @@ import java.awt.event.ActionListener;
  * Created by Robert Campbell on 10/10/2017.
  */
 public class Main {
-    public static final int TICK_TIME_MS = 1000;
+    public static final int TICK_TIME_MS = 50;
 
     public static void main(String[] args) {
         Board board = new Board(new Tile[][]{
@@ -27,8 +27,8 @@ public class Main {
         world.addEntity(unit);
         unit.setMovePoint(new Point.Double(1.5, 1.5));
 
-        Client client = new Client(World.NULL_WORLD);
         Server server = new Server(world);
+        Client client = new Client(World.NULL_WORLD, server);
         server.addClient(client);
         server.updateClients();
 

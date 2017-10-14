@@ -47,8 +47,8 @@ public abstract class Unit extends OwnedEntity {
             return;
         }
 
-        double deltaX = moveX/(moveX+moveY) * movementSpeed;
-        double deltaY = moveY/(moveX+moveY) * movementSpeed;
+        double deltaX = moveX/(Math.abs(moveX)+Math.abs(moveY)) * movementSpeed;
+        double deltaY = moveY/(Math.abs(moveX)+Math.abs(moveY)) * movementSpeed;
         this.moveBy(world.getBoard(), deltaX, deltaY);
     }
 }

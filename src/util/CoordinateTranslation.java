@@ -16,7 +16,11 @@ public class CoordinateTranslation {
         this.yMultiplier = yMultiplier;
     }
 
-    public Point getTransformedPoint(Point.Double initialPoint) {
+    public Point toScreenCoordinates(Point.Double initialPoint) {
         return new Point((int)(initialPoint.x*xMultiplier) + xOffset, (int)(initialPoint.y*yMultiplier) + yOffset);
+    }
+
+    public Point.Double toWorldCoordinates(Point initialPoint) {
+        return new Point.Double((double)(initialPoint.x - xOffset) / xMultiplier, (double)(initialPoint.y - yOffset) / yMultiplier);
     }
 }

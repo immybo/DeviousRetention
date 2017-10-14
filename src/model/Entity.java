@@ -56,8 +56,8 @@ public abstract class Entity {
     }
 
     public void renderOn(Graphics g, CoordinateTranslation translation) {
-        Point topLeft = translation.getTransformedPoint(new Point.Double(getX(), getY()));
-        Point size = translation.getTransformedPoint(new Point.Double(getSize(), getSize()));;
+        Point topLeft = translation.toScreenCoordinates(new Point.Double(getX(), getY()));
+        Point size = translation.toScreenCoordinates(new Point.Double(getSize(), getSize()));;
         g.setColor(Color.WHITE);
         g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
         g.setColor(Color.BLACK);
