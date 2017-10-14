@@ -2,5 +2,7 @@ package model.tile;
 
 import model.Tile;
 
-public class GrassTile implements Tile {
+import java.io.Serializable;
+
+public class GrassTile implements Tile, Serializable {
 }

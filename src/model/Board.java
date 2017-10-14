@@ -3,12 +3,13 @@ package model;
 import util.CoordinateTranslation;
 
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * Represents the background tiles in the world.
  * These tiles are both cosmetic and can have collision properties.
  */
-public class Board {
+public class Board implements Serializable {
     private final Tile[][] tiles;
     private final int width;
     private final int height;

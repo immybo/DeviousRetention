@@ -3,11 +3,12 @@ package model;
 import util.CoordinateTranslation;
 
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * Something on the layer above tiles, can be interacted with by other entities.
  */
-public abstract class Entity {
+public abstract class Entity implements Serializable {
     private double x;
     private double y;
     private double size;

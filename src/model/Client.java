@@ -1,5 +1,6 @@
 package model;
 
+import controller.MoveAction;
 import model.entity.Unit;
 import network.CTSConnection;
 import network.STCConnection;
@@ -10,14 +11,13 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-public class Client implements STCConnection {
+public class Client {
     private JFrame frame;
     private World world;
-    private CTSConnection server;
+    private CTSConnection server = null;
 
-    public Client(World world, CTSConnection server) {
+    public Client(World world) {
         this.world = world;
-        this.server = server;
 
         frame = new JFrame();
         JPanel panel = new JPanel() {
@@ -38,7 +38,11 @@ public class Client implements STCConnection {
                     int worldHeight = getWorld().getBoard().getHeight();
                     CoordinateTranslation translate = new CoordinateTranslation(0, 0, panel.getWidth()/worldWidth, panel.getHeight()/worldHeight);
                     Point.Double pt = translate.toWorldCoordinates(new Point(e.getX(), e.getY()));
-                    server.moveTo((Unit)getWorld().getEntities()[0], pt);
+                    if (server == null) {
+                        System.err.println("Unable to send movement action as client is not connected.");
+                    } else {
+                        server.send(new MoveAction()); //moveTo((Unit) getWorld().getEntities()[0], pt);
+                    }
                 }
             }
 
@@ -71,7 +75,10 @@ public class Client implements STCConnection {
         frame.repaint();
     }
 
-    @Override
+    public void setServer(CTSConnection server) {
+        this.server = server;
+    }
+
     public void setWorld(World world) {
         this.world = world;
         frame.repaint();

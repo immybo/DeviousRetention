@@ -4,6 +4,7 @@ import model.tile.GrassTile;
 import util.CoordinateTranslation;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * Represents everything on the board, e.g. the entities and
  * the tiles.
  */
-public class World {
+public class World implements Serializable {
     public static final World NULL_WORLD = new World(new Board(new Tile[][]{new Tile[]{new GrassTile()}}));
 
     private final Board board;

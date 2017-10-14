@@ -1,6 +1,7 @@
+package controller;
+
 import model.World;
 import model.entity.Unit;
-import network.CTSConnection;
 import network.STCConnection;
 
 import java.awt.*;
@@ -11,7 +12,7 @@ import java.util.List;
  * Controls the game. Note that a server doesn't necessarily have to be
  * over the network; a server and client can exist on the same computer.
  */
-public class Server implements CTSConnection {
+public class Server {
     private List<STCConnection> clients;
     private World world;
 
@@ -26,13 +27,16 @@ public class Server implements CTSConnection {
 
     public void updateClients() {
         for (STCConnection client : clients) {
-            client.setWorld(world);
+            client.send(world);
         }
     }
 
-    @Override
     public void moveTo(Unit unit, Point.Double worldPosition) {
         // Just assume that they're allowed to for now
         unit.setMovePoint(worldPosition);
+    }
+
+    public void processAction(Action a) {
+        ((Unit)(world.getEntities()[0])).setMovePoint(new Point.Double(2, 2)); // Placeholder
     }
 }
