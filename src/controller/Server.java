@@ -37,6 +37,6 @@ public class Server {
     }
 
     public void processAction(Action a) {
-        ((Unit)(world.getEntities()[0])).setMovePoint(new Point.Double(2, 2)); // Placeholder
+        a.run(world);
     }
 }

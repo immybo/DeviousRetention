@@ -33,17 +33,6 @@ public class Client {
         panel.addMouseListener(new MouseListener(){
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON3) {
-                    int worldWidth = getWorld().getBoard().getWidth();
-                    int worldHeight = getWorld().getBoard().getHeight();
-                    CoordinateTranslation translate = new CoordinateTranslation(0, 0, panel.getWidth()/worldWidth, panel.getHeight()/worldHeight);
-                    Point.Double pt = translate.toWorldCoordinates(new Point(e.getX(), e.getY()));
-                    if (server == null) {
-                        System.err.println("Unable to send movement action as client is not connected.");
-                    } else {
-                        server.send(new MoveAction()); //moveTo((Unit) getWorld().getEntities()[0], pt);
-                    }
-                }
             }
 
             @Override
@@ -53,7 +42,17 @@ public class Client {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    int worldWidth = getWorld().getBoard().getWidth();
+                    int worldHeight = getWorld().getBoard().getHeight();
+                    CoordinateTranslation translate = new CoordinateTranslation(0, 0, panel.getWidth()/worldWidth, panel.getHeight()/worldHeight);
+                    Point.Double pt = translate.toWorldCoordinates(new Point(e.getX(), e.getY()));
+                    if (server == null) {
+                        System.err.println("Unable to send movement action as client is not connected.");
+                    } else {
+                        server.send(new MoveAction(getWorld().getEntities()[0].id, pt));
+                    }
+                }
             }
 
             @Override

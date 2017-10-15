@@ -47,4 +47,15 @@ public class World implements Serializable {
             e.tick(this);
         }
     }
+
+    public Entity getEntityByID(int id) {
+        // Naiive for now; might not need improvement depending on where we use this
+        for (Entity e : entities) {
+            if (e.id == id) {
+                return e;
+            }
+        }
+
+        throw new IllegalArgumentException("Unable to find entity with ID " + id);
+    }
 }

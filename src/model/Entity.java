@@ -9,6 +9,10 @@ import java.io.Serializable;
  * Something on the layer above tiles, can be interacted with by other entities.
  */
 public abstract class Entity implements Serializable {
+    private static int nextID = 0;
+
+    public final int id;
+
     private double x;
     private double y;
     private double size;
@@ -17,6 +21,9 @@ public abstract class Entity implements Serializable {
         this.x = x;
         this.y = y;
         this.size = size;
+
+        this.id = nextID;
+        nextID++;
     }
 
     public double getX() {
