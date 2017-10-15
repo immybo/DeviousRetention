@@ -13,6 +13,7 @@ import java.awt.event.MouseListener;
 
 public class Client {
     private JFrame frame;
+    private JPanel panel;
     private World world;
     private CTSConnection server = null;
 
@@ -20,7 +21,7 @@ public class Client {
         this.world = world;
 
         frame = new JFrame();
-        JPanel panel = new JPanel() {
+        panel = new JPanel() {
             @Override
             public void paint(Graphics g) {
                 super.paint(g);
@@ -43,10 +44,7 @@ public class Client {
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON3) {
-                    int worldWidth = getWorld().getBoard().getWidth();
-                    int worldHeight = getWorld().getBoard().getHeight();
-                    CoordinateTranslation translate = new CoordinateTranslation(0, 0, panel.getWidth()/worldWidth, panel.getHeight()/worldHeight);
-                    Point.Double pt = translate.toWorldCoordinates(new Point(e.getX(), e.getY()));
+                    Point.Double pt = getCoordinateTranslation().toWorldCoordinates(new Point(e.getX(), e.getY()));
                     if (server == null) {
                         System.err.println("Unable to send movement action as client is not connected.");
                     } else {
@@ -85,5 +83,9 @@ public class Client {
 
     private World getWorld() {
         return world;
+    }
+
+    private CoordinateTranslation getCoordinateTranslation() {
+        return new CoordinateTranslation(0, 0, panel.getWidth()/getWorld().getBoard().getWidth(), panel.getHeight()/getWorld().getBoard().getHeight());
     }
 }
