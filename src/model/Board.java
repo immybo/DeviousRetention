@@ -36,7 +36,7 @@ public class Board implements Serializable {
     }
 
     public void renderOn(Graphics g, CoordinateTranslation translation) {
-        Point size = translation.toScreenCoordinates(new Point.Double(1, 1));
+        Point size = translation.getWorldToScreenMultiplier();
 
         for (int i = 0; i < getWidth(); i++) {
             for (int j = 0; j < getHeight(); j++) {

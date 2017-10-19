@@ -23,4 +23,8 @@ public class CoordinateTranslation {
     public Point.Double toWorldCoordinates(Point initialPoint) {
         return new Point.Double((double)(initialPoint.x - xOffset) / xMultiplier, (double)(initialPoint.y - yOffset) / yMultiplier);
     }
+
+    public Point getWorldToScreenMultiplier() {
+        return new Point((int)(xMultiplier), (int)(yMultiplier));
+    }
 }

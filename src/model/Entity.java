@@ -65,7 +65,8 @@ public abstract class Entity implements Serializable {
 
     public void renderOn(Graphics g, CoordinateTranslation translation) {
         Point topLeft = translation.toScreenCoordinates(new Point.Double(getX(), getY()));
-        Point size = translation.toScreenCoordinates(new Point.Double(getSize(), getSize()));;
+        Point size = new Point((int)(translation.getWorldToScreenMultiplier().x*getSize()),
+                (int)(translation.getWorldToScreenMultiplier().y*getSize()));
         g.setColor(Color.WHITE);
         g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
         g.setColor(Color.BLACK);

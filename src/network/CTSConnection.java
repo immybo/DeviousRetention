@@ -1,7 +1,7 @@
 package network;
 
 import controller.Action;
-import model.Client;
+import view.Client;
 import model.World;
 
 import java.io.IOException;

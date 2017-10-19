@@ -1,7 +1,7 @@
 package controller;
 
 import model.Board;
-import model.Client;
+import view.Client;
 import model.Tile;
 import model.World;
 import model.entity.TestUnit;

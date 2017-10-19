@@ -1,6 +1,7 @@
-package model;
+package view;
 
 import controller.MoveAction;
+import model.World;
 import model.entity.Unit;
 import network.CTSConnection;
 import network.STCConnection;
@@ -8,17 +9,30 @@ import util.CoordinateTranslation;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class Client {
+    private static final double KEY_MOVEMENT_SPEED = 1;
+
     private JFrame frame;
     private JPanel panel;
     private World world;
     private CTSConnection server = null;
 
+    private double xOffset;
+    private double yOffset;
+    private int tileSize;
+    private double zoom;
+
     public Client(World world) {
         this.world = world;
+        this.xOffset = 0;
+        this.yOffset = 0;
+        this.zoom = 1;
+        this.tileSize = 200;
 
         frame = new JFrame();
         panel = new JPanel() {
@@ -27,11 +41,11 @@ public class Client {
                 super.paint(g);
                 int worldWidth = getWorld().getBoard().getWidth();
                 int worldHeight = getWorld().getBoard().getHeight();
-                getWorld().renderOn(g, new CoordinateTranslation(0, 0, getWidth()/worldWidth, getHeight()/worldHeight));
+                getWorld().renderOn(g, getCoordinateTranslation());
             }
         };
 
-        panel.addMouseListener(new MouseListener(){
+        frame.addMouseListener(new MouseListener(){
             @Override
             public void mouseClicked(MouseEvent e) {
             }
@@ -64,6 +78,31 @@ public class Client {
             }
         });
 
+        frame.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                    xOffset += KEY_MOVEMENT_SPEED;
+                } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                    xOffset -= KEY_MOVEMENT_SPEED;
+                } else if (e.getKeyCode() == KeyEvent.VK_UP) {
+                    yOffset += KEY_MOVEMENT_SPEED;
+                } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                    yOffset -= KEY_MOVEMENT_SPEED;
+                }
+            }
+        });
+
         frame.add(panel);
         frame.setMinimumSize(new Dimension(500, 500));
         frame.pack();
@@ -86,6 +125,6 @@ public class Client {
     }
 
     private CoordinateTranslation getCoordinateTranslation() {
-        return new CoordinateTranslation(0, 0, panel.getWidth()/getWorld().getBoard().getWidth(), panel.getHeight()/getWorld().getBoard().getHeight());
+        return new CoordinateTranslation((int)(xOffset*tileSize), (int)(yOffset*tileSize), tileSize, tileSize);
     }
 }
