@@ -9,13 +9,13 @@ import util.CoordinateTranslation;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 
 public class Client {
     private static final double KEY_MOVEMENT_SPEED = 1;
+    private static final double MIN_ZOOM = 0.1;
+    private static final double MAX_ZOOM = 10;
+    private static final double ZOOM_CHANGE_MULTIPLIER = 1.2;
 
     private JFrame frame;
     private JPanel panel;
@@ -103,8 +103,17 @@ public class Client {
             }
         });
 
+        frame.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int rotAmount = e.getWheelRotation();
+                zoom *= Math.pow(ZOOM_CHANGE_MULTIPLIER, -rotAmount);
+                zoom = zoom < MIN_ZOOM ? MIN_ZOOM : zoom > MAX_ZOOM ? MAX_ZOOM : zoom;
+            }
+        });
+
         frame.add(panel);
-        frame.setMinimumSize(new Dimension(500, 500));
+        frame.setMinimumSize(new Dimension(1920, 1080));
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -125,6 +134,6 @@ public class Client {
     }
 
     private CoordinateTranslation getCoordinateTranslation() {
-        return new CoordinateTranslation((int)(xOffset*tileSize), (int)(yOffset*tileSize), tileSize, tileSize);
+        return new CoordinateTranslation((int)(xOffset*tileSize*zoom), (int)(yOffset*tileSize*zoom), tileSize*zoom, tileSize*zoom);
     }
 }
