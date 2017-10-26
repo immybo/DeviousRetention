@@ -52,7 +52,6 @@ public class Client {
                 for (Integer i : getSelected()) {
                     Entity e = getWorld().getEntityByID(i);
                     Rectangle.Double bounds = e.getBounds();
-                    System.out.println(bounds.x);
                     Rectangle screenBounds = translation.toScreenCoordinates(bounds);
                     g.drawRect(screenBounds.x, screenBounds.y, screenBounds.width, screenBounds.height);
                 }
@@ -81,7 +80,9 @@ public class Client {
                     if (server == null) {
                         System.err.println("Unable to send movement action as client is not connected.");
                     } else {
-                        server.send(new MoveAction(getWorld().getEntities()[0].id, pt));
+                        for (Integer id : selectedIds) {
+                            server.send(new MoveAction(id, pt));
+                        }
                     }
                 }
             }
