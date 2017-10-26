@@ -58,4 +58,15 @@ public class World implements Serializable {
 
         throw new IllegalArgumentException("Unable to find entity with ID " + id);
     }
+
+    public Entity getEntityAt(Point.Double point) {
+        // Just return the first one we find
+        for (Entity e : entities) {
+            if (e.getBounds().contains(point)) {
+                return e;
+            }
+        }
+
+        return null;
+    }
 }

@@ -1,6 +1,7 @@
 package view;
 
 import controller.MoveAction;
+import model.Entity;
 import model.World;
 import model.entity.Unit;
 import network.CTSConnection;
@@ -10,6 +11,7 @@ import util.CoordinateTranslation;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class Client {
     private static final double KEY_MOVEMENT_SPEED = 1;
@@ -22,6 +24,8 @@ public class Client {
     private World world;
     private CTSConnection server = null;
 
+    private java.util.List<Integer> selectedIds;
+
     private double xOffset;
     private double yOffset;
     private int tileSize;
@@ -33,15 +37,25 @@ public class Client {
         this.yOffset = 0;
         this.zoom = 1;
         this.tileSize = 200;
+        this.selectedIds = new ArrayList<Integer>();
 
         frame = new JFrame();
         panel = new JPanel() {
             @Override
             public void paint(Graphics g) {
                 super.paint(g);
-                int worldWidth = getWorld().getBoard().getWidth();
-                int worldHeight = getWorld().getBoard().getHeight();
-                getWorld().renderOn(g, getCoordinateTranslation());
+                CoordinateTranslation translation = getCoordinateTranslation();
+                getWorld().renderOn(g, translation);
+
+                // Draw a box around all of the selected entities
+                g.setColor(Color.BLACK);
+                for (Integer i : getSelected()) {
+                    Entity e = getWorld().getEntityByID(i);
+                    Rectangle.Double bounds = e.getBounds();
+                    System.out.println(bounds.x);
+                    Rectangle screenBounds = translation.toScreenCoordinates(bounds);
+                    g.drawRect(screenBounds.x, screenBounds.y, screenBounds.width, screenBounds.height);
+                }
             }
         };
 
@@ -52,13 +66,18 @@ public class Client {
 
             @Override
             public void mousePressed(MouseEvent e) {
-
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON3) {
-                    Point.Double pt = getCoordinateTranslation().toWorldCoordinates(new Point(e.getX(), e.getY()));
+                Point.Double pt = getCoordinateTranslation().toWorldCoordinates(new Point(e.getX(), e.getY()));
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    Entity underMouse = getWorld().getEntityAt(pt);
+                    if (underMouse != null) {
+                        selectedIds.clear();
+                        selectedIds.add(underMouse.id);
+                    }
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
                     if (server == null) {
                         System.err.println("Unable to send movement action as client is not connected.");
                     } else {
@@ -131,6 +150,10 @@ public class Client {
 
     private World getWorld() {
         return world;
+    }
+
+    private java.util.List<Integer> getSelected() {
+        return selectedIds;
     }
 
     private CoordinateTranslation getCoordinateTranslation() {

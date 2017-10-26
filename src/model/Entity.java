@@ -74,6 +74,10 @@ public abstract class Entity implements Serializable {
         g.drawString(this.getClass().getCanonicalName(), topLeft.x + 10, topLeft.y + 50);
     }
 
+    public Rectangle.Double getBounds() {
+        return new Rectangle.Double(x, y, size, size);
+    }
+
     public void tick(World world) {
 
     }

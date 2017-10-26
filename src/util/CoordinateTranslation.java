@@ -20,6 +20,12 @@ public class CoordinateTranslation {
         return new Point((int)(initialPoint.x*xMultiplier) + xOffset, (int)(initialPoint.y*yMultiplier) + yOffset);
     }
 
+    public Rectangle toScreenCoordinates(Rectangle.Double initialBounds) {
+        Point topLeft = toScreenCoordinates(new Point.Double(initialBounds.x, initialBounds.y));
+        Point bottomRight = toScreenCoordinates(new Point.Double(initialBounds.getMaxX(), initialBounds.getMaxY()));
+        return new Rectangle(topLeft.x, topLeft.y, bottomRight.x-topLeft.x, bottomRight.y-topLeft.y);
+    }
+
     public Point.Double toWorldCoordinates(Point initialPoint) {
         return new Point.Double((double)(initialPoint.x - xOffset) / xMultiplier, (double)(initialPoint.y - yOffset) / yMultiplier);
     }
