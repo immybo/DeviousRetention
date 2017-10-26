@@ -58,79 +58,9 @@ public class Client {
             }
         };
 
-        frame.addMouseListener(new MouseListener(){
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                Point.Double pt = getCoordinateTranslation().toWorldCoordinates(new Point(e.getX(), e.getY()));
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    Entity underMouse = getWorld().getEntityAt(pt);
-                    if (underMouse != null) {
-                        selectedIds.clear();
-                        selectedIds.add(underMouse.id);
-                    }
-                } else if (e.getButton() == MouseEvent.BUTTON3) {
-                    if (server == null) {
-                        System.err.println("Unable to send movement action as client is not connected.");
-                    } else {
-                        for (Integer id : selectedIds) {
-                            server.send(new MoveAction(id, pt));
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
-
-        frame.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    xOffset += KEY_MOVEMENT_SPEED;
-                } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    xOffset -= KEY_MOVEMENT_SPEED;
-                } else if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    yOffset += KEY_MOVEMENT_SPEED;
-                } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    yOffset -= KEY_MOVEMENT_SPEED;
-                }
-            }
-        });
-
-        frame.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                int rotAmount = e.getWheelRotation();
-                zoom *= Math.pow(ZOOM_CHANGE_MULTIPLIER, -rotAmount);
-                zoom = zoom < MIN_ZOOM ? MIN_ZOOM : zoom > MAX_ZOOM ? MAX_ZOOM : zoom;
-            }
-        });
+        frame.addMouseListener(new ClientMouseListener());
+        frame.addKeyListener(new ClientKeyListener());
+        frame.addMouseWheelListener(new ClientMouseWheelListener());
 
         frame.add(panel);
         frame.setMinimumSize(new Dimension(1920, 1080));
@@ -159,5 +89,79 @@ public class Client {
 
     private CoordinateTranslation getCoordinateTranslation() {
         return new CoordinateTranslation((int)(xOffset*tileSize*zoom), (int)(yOffset*tileSize*zoom), tileSize*zoom, tileSize*zoom);
+    }
+
+    private class ClientMouseListener implements MouseListener {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            Point.Double pt = getCoordinateTranslation().toWorldCoordinates(new Point(e.getX(), e.getY()));
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                Entity underMouse = getWorld().getEntityAt(pt);
+                if (underMouse != null) {
+                    selectedIds.clear();
+                    selectedIds.add(underMouse.id);
+                }
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
+                if (server == null) {
+                    System.err.println("Unable to send movement action as client is not connected.");
+                } else {
+                    for (Integer id : selectedIds) {
+                        server.send(new MoveAction(id, pt));
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+
+        }
+    }
+
+    private class ClientKeyListener implements KeyListener {
+        @Override
+        public void keyTyped(KeyEvent e) {
+
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                xOffset += KEY_MOVEMENT_SPEED;
+            } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                xOffset -= KEY_MOVEMENT_SPEED;
+            } else if (e.getKeyCode() == KeyEvent.VK_UP) {
+                yOffset += KEY_MOVEMENT_SPEED;
+            } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                yOffset -= KEY_MOVEMENT_SPEED;
+            }
+        }
+    }
+
+    private class ClientMouseWheelListener implements MouseWheelListener {
+        @Override
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            int rotAmount = e.getWheelRotation();
+            zoom *= Math.pow(ZOOM_CHANGE_MULTIPLIER, -rotAmount);
+            zoom = zoom < MIN_ZOOM ? MIN_ZOOM : zoom > MAX_ZOOM ? MAX_ZOOM : zoom;
+        }
     }
 }
