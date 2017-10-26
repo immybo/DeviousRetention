@@ -52,14 +52,14 @@ public abstract class Entity implements Serializable {
 
         if (getX() < 0) {
             this.x = 0;
-        } else if (getX() - size > board.getWidth() - 1) {
-            this.x = board.getWidth() - 1 - size;
+        } else if (getX() + size > board.getWidth()) {
+            this.x = board.getWidth() - size;
         }
 
         if (getY() < 0) {
             this.y = 0;
-        } else if (getY() - size > board.getHeight() - 1) {
-            this.y = board.getHeight() - 1 - size;
+        } else if (getY() + size > board.getHeight()) {
+            this.y = board.getHeight() - size;
         }
     }
 
