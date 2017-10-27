@@ -3,6 +3,7 @@ package view;
 import controller.MoveAction;
 import model.Entity;
 import model.World;
+import model.entity.OwnedEntity;
 import model.entity.Unit;
 import network.CTSConnection;
 import network.STCConnection;
@@ -44,17 +45,21 @@ public class Client {
             @Override
             public void paint(Graphics g) {
                 super.paint(g);
+                Graphics2D g2d = (Graphics2D)g;
                 CoordinateTranslation translation = getCoordinateTranslation();
-                getWorld().renderOn(g, translation);
+                getWorld().renderOn(g2d, translation);
 
                 // Draw a box around all of the selected entities
-                g.setColor(Color.BLACK);
+                Stroke oldStroke = g2d.getStroke();
+                g2d.setStroke(new BasicStroke(5));
                 for (Integer i : getSelected()) {
                     Entity e = getWorld().getEntityByID(i);
+                    g2d.setColor(e.getPlayerColor());
                     Rectangle.Double bounds = e.getBounds();
                     Rectangle screenBounds = translation.toScreenCoordinates(bounds);
-                    g.drawRect(screenBounds.x, screenBounds.y, screenBounds.width, screenBounds.height);
+                    g2d.drawRect(screenBounds.x, screenBounds.y, screenBounds.width, screenBounds.height);
                 }
+                g2d.setStroke(oldStroke);
             }
         };
 

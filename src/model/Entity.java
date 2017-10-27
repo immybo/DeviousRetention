@@ -81,4 +81,8 @@ public abstract class Entity implements Serializable {
     public void tick(World world) {
 
     }
+
+    public Color getPlayerColor() {
+        return Color.BLACK;
+    }
 }
