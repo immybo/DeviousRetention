@@ -13,8 +13,10 @@ public abstract class Entity implements Serializable {
 
     public final int id;
 
+    // Center position
     private double x;
     private double y;
+
     private double size;
 
     public Entity(double x, double y, double size) {
@@ -50,21 +52,21 @@ public abstract class Entity implements Serializable {
     public void moveBy(Board board, double x, double y) {
         moveBy(x, y);
 
-        if (getX() < 0) {
-            this.x = 0;
-        } else if (getX() + size > board.getWidth()) {
-            this.x = board.getWidth() - size;
+        if (getX() < getSize()/2) {
+            this.x = getSize()/2;
+        } else if (getX() + getSize()/2 > board.getWidth()) {
+            this.x = board.getWidth() - getSize()/2;
         }
 
-        if (getY() < 0) {
-            this.y = 0;
-        } else if (getY() + size > board.getHeight()) {
-            this.y = board.getHeight() - size;
+        if (getY() < getSize()/2) {
+            this.y = getSize()/2;
+        } else if (getY() + getSize()/2 > board.getHeight()) {
+            this.y = board.getHeight() - getSize()/2;
         }
     }
 
     public void renderOn(Graphics g, CoordinateTranslation translation) {
-        Point topLeft = translation.toScreenCoordinates(new Point.Double(getX(), getY()));
+        Point topLeft = translation.toScreenCoordinates(new Point.Double(getX()-getSize()/2, getY()-getSize()/2));
         Point size = new Point((int)(translation.getWorldToScreenMultiplier().x*getSize()),
                 (int)(translation.getWorldToScreenMultiplier().y*getSize()));
         g.setColor(Color.WHITE);
@@ -75,7 +77,7 @@ public abstract class Entity implements Serializable {
     }
 
     public Rectangle.Double getBounds() {
-        return new Rectangle.Double(x, y, size, size);
+        return new Rectangle.Double(x-getSize()/2, y-getSize()/2, getSize(), getSize());
     }
 
     public void tick(World world) {
