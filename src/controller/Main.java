@@ -28,7 +28,9 @@ public class Main {
         });
         World world = new World(board);
         Unit unit = new TestUnit(0.5, 0.5, 1, 0);
+        Unit unit2 = new TestUnit(1.5, 0.5, 0.8, 1);
         world.addEntity(unit);
+        world.addEntity(unit2);
         unit.setMovePoint(new Point.Double(1.5, 1.5));
 
         Server server = new Server(world);

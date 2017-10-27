@@ -87,4 +87,26 @@ public abstract class Entity implements Serializable {
     public Color getPlayerColor() {
         return Color.BLACK;
     }
+
+    /**
+     * Returns the straight-line distance between this and
+     * another entity.
+     */
+    public double distanceTo(Entity other) {
+        return Math.sqrt(Math.pow(getX()-other.getX(), 2) + Math.pow(getY()-other.getY(), 2));
+    }
+
+    public Point.Double vectorTo(Entity other) {
+        return new Point.Double(getX()-other.getX(), getY()-other.getY());
+    }
+
+    /**
+     * Returns the closest point from this entity, which is
+     * within the given range of the given other entity.
+     */
+    public Point.Double closestPoint(Entity other, double range) {
+        // Hahahahah good implementation :) In future use path finding with
+        // termination criteria being within that range of other.
+        return new Point.Double(other.getX() - range, other.getY());
+    }
 }

@@ -1,6 +1,7 @@
 package model.entity;
 
 import model.Entity;
+import model.World;
 
 import java.awt.*;
 
@@ -8,10 +9,14 @@ public abstract class OwnedEntity extends Entity {
     public static final Color[] PLAYER_COLORS = {Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW};
 
     private int playerNumber;
+    private int maxHealth;
+    private int health;
 
-    public OwnedEntity(double x, double y, double size, int playerNumber) {
+    public OwnedEntity(double x, double y, double size, int playerNumber, int maxHealth) {
         super(x, y, size);
         this.playerNumber = playerNumber;
+        this.maxHealth = maxHealth;
+        this.health = maxHealth;
     }
 
     public int getPlayer() {
@@ -24,5 +29,26 @@ public abstract class OwnedEntity extends Entity {
             return super.getPlayerColor();
         }
         return PLAYER_COLORS[playerNumber];
+    }
+
+    public void changeHealth(int difference) {
+        this.health += difference;
+    }
+
+    public void setHealth(int newValue) {
+        this.health = newValue;
+    }
+
+    public int getHealth() {
+        return this.health;
+    }
+
+    @Override
+    public void tick(World world) {
+        super.tick(world);
+
+        if (getHealth() < 0) {
+            world.removeEntity(this);
+        }
     }
 }

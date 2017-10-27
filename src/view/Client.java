@@ -1,5 +1,6 @@
 package view;
 
+import controller.AttackAction;
 import controller.MoveAction;
 import model.Entity;
 import model.World;
@@ -118,8 +119,14 @@ public class Client {
                 if (server == null) {
                     System.err.println("Unable to send movement action as client is not connected.");
                 } else {
+                    Entity entAt = getWorld().getEntityAt(pt);
                     for (Integer id : selectedIds) {
-                        server.send(new MoveAction(id, pt));
+                        Entity selected = getWorld().getEntityByID(id);
+                        if (entAt != null && selected instanceof Unit && ((Unit)selected).canAttack(entAt)) {
+                            server.send(new AttackAction(id, entAt.id));
+                        } else {
+                            server.send(new MoveAction(id, pt));
+                        }
                     }
                 }
             }
