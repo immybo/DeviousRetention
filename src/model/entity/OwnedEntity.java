@@ -43,6 +43,14 @@ public abstract class OwnedEntity extends Entity {
         return this.health;
     }
 
+    public double getHealthProportion() {
+        if (this.maxHealth == 0) {
+            return 1;
+        } else {
+            return ((double)getHealth() / maxHealth);
+        }
+    }
+
     @Override
     public void tick(World world) {
         super.tick(world);

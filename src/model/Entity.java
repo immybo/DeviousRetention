@@ -1,5 +1,6 @@
 package model;
 
+import model.entity.OwnedEntity;
 import util.CoordinateTranslation;
 
 import java.awt.*;
@@ -69,11 +70,22 @@ public abstract class Entity implements Serializable {
         Point topLeft = translation.toScreenCoordinates(new Point.Double(getX()-getSize()/2, getY()-getSize()/2));
         Point size = new Point((int)(translation.getWorldToScreenMultiplier().x*getSize()),
                 (int)(translation.getWorldToScreenMultiplier().y*getSize()));
+        Point bottomRight = new Point(topLeft.x+size.x, topLeft.y+size.y);
         g.setColor(Color.WHITE);
         g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
         g.setColor(Color.BLACK);
         g.drawRect(topLeft.x, topLeft.y, size.x, size.y);
         g.drawString(this.getClass().getCanonicalName(), topLeft.x + 10, topLeft.y + 50);
+
+        if (this instanceof OwnedEntity) {
+            OwnedEntity e = ((OwnedEntity)this);
+            g.setColor(Color.RED);
+            g.fillRect(topLeft.x, topLeft.y - 20, size.x, 15);
+            g.setColor(Color.GREEN);
+            g.fillRect(topLeft.x, topLeft.y - 20, (int)(size.x * e.getHealthProportion()), 15);
+            g.setColor(Color.BLACK);
+            g.drawRect(topLeft.x, topLeft.y - 20, size.x, 15);
+        }
     }
 
     public Rectangle.Double getBounds() {
