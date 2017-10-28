@@ -17,16 +17,19 @@ public class World implements Serializable {
 
     private final Board board;
     private List<Entity> entities;
+
+    private List<Entity> entitiesToAdd;
     private List<Integer> entitiesToRemove;
 
     public World(Board board) {
         this.board = board;
         this.entities = new ArrayList<Entity>();
+        this.entitiesToAdd = new ArrayList<Entity>();
         this.entitiesToRemove = new ArrayList<Integer>();
     }
 
     public void addEntity(Entity entity) {
-        this.entities.add(entity);
+        entitiesToAdd.add(entity);
     }
     public void removeEntity(int id) { entitiesToRemove.add(id); }
     public void removeEntity(Entity ent) { entitiesToRemove.add(ent.id); }
@@ -47,6 +50,11 @@ public class World implements Serializable {
     }
 
     public void tick() {
+        for (Entity e : entitiesToAdd) {
+            entities.add(e);
+        }
+        entitiesToAdd.clear();
+
         for (Integer entID : entitiesToRemove) {
             entities.remove(getEntityByID(entID));
         }

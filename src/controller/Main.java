@@ -1,13 +1,10 @@
 package controller;
 
 import model.Board;
-import model.entity.Building;
-import model.entity.TestBuilding;
+import model.entity.*;
 import view.Client;
 import model.Tile;
 import model.World;
-import model.entity.TestUnit;
-import model.entity.Unit;
 import model.tile.GrassTile;
 import network.CTSConnection;
 import network.STCConnection;
@@ -24,6 +21,8 @@ public class Main {
     public static final int TICK_TIME_MS = 50;
 
     public static void main(String[] args) {
+        EntityManager.initialise();
+
         Tile[][] tiles = new Tile[10][10];
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[0].length; j++) {
@@ -33,13 +32,15 @@ public class Main {
         Board board = new Board(tiles);
 
         World world = new World(board);
-        Unit unit = new TestUnit(0.5, 0.5, 1, 0);
-        Unit unit2 = new TestUnit(1.5, 0.5, 0.8, 1);
-        Building building = new TestBuilding(3, 3, 2, 0, 100);
+        Unit unit = new TestUnit(0.5, 0.5, 0);
+        Unit unit2 = new TestUnit(1.5, 0.5, 1);
+        Building building = new TestBuilding(3, 3, 0);
         world.addEntity(unit);
         world.addEntity(unit2);
         world.addEntity(building);
         unit.setMovePoint(new Point.Double(1.5, 1.5));
+
+        building.train(building.trainableUnits()[0]);
 
         Server server = new Server(world);
         STCConnection stc = new STCConnection(server);
