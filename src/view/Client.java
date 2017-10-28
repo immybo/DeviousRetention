@@ -4,6 +4,7 @@ import controller.AttackAction;
 import controller.MoveAction;
 import model.Entity;
 import model.World;
+import model.entity.Building;
 import model.entity.OwnedEntity;
 import model.entity.Unit;
 import network.CTSConnection;

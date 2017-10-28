@@ -38,9 +38,6 @@ public class Main {
         world.addEntity(unit);
         world.addEntity(unit2);
         world.addEntity(building);
-        unit.setMovePoint(new Point.Double(1.5, 1.5));
-
-        building.train(building.trainableUnits()[0]);
 
         Server server = new Server(world);
         STCConnection stc = new STCConnection(server);
@@ -57,6 +54,9 @@ public class Main {
         client.setServer(cts);
 
         server.updateClients();
+        world.tick();
+
+        cts.send(new TrainAction(building.id, EntityManager.UNIT.TEST_UNIT));
 
         Timer timer = new Timer(TICK_TIME_MS, new ActionListener(){
             @Override
