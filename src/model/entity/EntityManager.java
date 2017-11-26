@@ -20,6 +20,9 @@ public class EntityManager {
         TEST_BUILDING
     }
 
+    private Map<UNIT, Integer> unitCosts = new HashMap<>();
+    private Map<BUILDING, Integer> buildingCosts = new HashMap<>();
+
     private Map<UNIT, Constructor<? extends Unit>> unitTypes = new HashMap<>();
     private Map<BUILDING, Constructor<? extends Building>> buildingTypes = new HashMap<>();
 
@@ -36,20 +39,30 @@ public class EntityManager {
 
     private void initUnits() {
         unitTypes = new HashMap<UNIT, Constructor<? extends Unit>>();
-        registerUnit(UNIT.TEST_UNIT, getUnitConstructor(TestUnit.class));
+        registerUnit(UNIT.TEST_UNIT, getUnitConstructor(TestUnit.class), 100);
     }
 
     private void initBuildings() {
         buildingTypes = new HashMap<BUILDING, Constructor<? extends Building>>();
-        registerBuilding(BUILDING.TEST_BUILDING, getBuildingConstructor(TestBuilding.class));
+        registerBuilding(BUILDING.TEST_BUILDING, getBuildingConstructor(TestBuilding.class), 1000);
     }
 
-    private void registerUnit(UNIT unitClass, Constructor<? extends Unit> unitConstructor) {
+    private void registerUnit(UNIT unitClass, Constructor<? extends Unit> unitConstructor, int cost) {
         unitTypes.put(unitClass, unitConstructor);
+        unitCosts.put(unitClass, cost);
     }
 
-    private void registerBuilding(BUILDING buildingClass, Constructor<? extends Building> buildingConstructor) {
+    private void registerBuilding(BUILDING buildingClass, Constructor<? extends Building> buildingConstructor, int cost) {
         buildingTypes.put(buildingClass, buildingConstructor);
+        buildingCosts.put(buildingClass, cost);
+    }
+
+    public static int getUnitCost(UNIT unitClass) {
+        return instance.unitCosts.get(unitClass);
+    }
+
+    public static int getBuildingCost(BUILDING buildingClass) {
+        return instance.buildingCosts.get(buildingClass);
     }
 
     private Constructor<? extends Unit> getUnitConstructor(Class<? extends Unit> unitClass) {

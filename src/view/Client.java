@@ -2,10 +2,12 @@ package view;
 
 import controller.AttackAction;
 import controller.MoveAction;
+import controller.TrainAction;
 import model.Entity;
 import model.Player;
 import model.World;
 import model.entity.Building;
+import model.entity.EntityManager;
 import model.entity.OwnedEntity;
 import model.entity.Unit;
 import network.CTSConnection;
@@ -179,6 +181,25 @@ public class Client {
                 yOffset += KEY_MOVEMENT_SPEED;
             } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
                 yOffset -= KEY_MOVEMENT_SPEED;
+            } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                for (Integer id : selectedIds) {
+                    Entity selected = getWorld().getEntityByID(id);
+                    if (selected instanceof Building) {
+                        Building selectedB = (Building)selected;
+                        if (selectedB.getPlayerNumber() == player.getPlayerNumber()) {
+                            try {
+                                EntityManager.UNIT toTrain = selectedB.trainableUnits()[0];
+                                if (player.spendCredits(EntityManager.getUnitCost(toTrain))) {
+                                    server.send(new TrainAction(id, toTrain));
+                                } else {
+                                    // Show not enough credits to user TODO
+                                }
+                            } catch (ArrayIndexOutOfBoundsException ex) {
+                                // This is fine; just means we can't train anything
+                            }
+                        }
+                    }
+                }
             }
         }
     }

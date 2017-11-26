@@ -62,9 +62,11 @@ public class Main {
     }
 
     private static void launchClient(Server server) {
+        Player player = new Player(currentPlayerNumber++);
+        player.earnCredits(10000);
         STCConnection stc = new STCConnection(server);
         server.addClient(stc);
-        Client client = new Client(World.NULL_WORLD, new Player(currentPlayerNumber++));
+        Client client = new Client(World.NULL_WORLD, player);
         CTSConnection cts = new CTSConnection(client);
         client.setServer(cts);
     }
