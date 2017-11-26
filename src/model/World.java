@@ -86,4 +86,14 @@ public class World implements Serializable {
 
         return null;
     }
+
+    public Entity[] getEntitiesIn(Rectangle.Double rect) {
+        List<Entity> ret = new ArrayList<Entity>();
+        for (Entity e : entities) {
+            if (e.getBounds().intersects(rect)) {
+                ret.add(e);
+            }
+        }
+        return ret.toArray(new Entity[0]);
+    }
 }

@@ -17,6 +17,7 @@ import util.CoordinateTranslation;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 public class Client {
@@ -38,6 +39,13 @@ public class Client {
     private double yOffset;
     private int tileSize;
     private double zoom;
+
+    private int mousePressX = -1;
+    private int mousePressY = -1;
+    private int mousePressType = -1;
+
+    private int mouseX = -1;
+    private int mouseY = -1;
 
     public Client(World world, Player player) {
         this.world = world;
@@ -72,12 +80,23 @@ public class Client {
                 }
                 g2d.setStroke(oldStroke);
 
+                // Draw a box around the selected area, if there is one
+                if (mousePressX != -1) {
+                    g2d.setColor(Color.BLACK);
+                    int left = Math.min(mousePressX, mouseX);
+                    int top = Math.min(mousePressY, mouseY);
+                    int width = Math.max(mousePressX, mouseX) - left;
+                    int height = Math.max(mousePressY, mouseY) - top;
+                    g2d.drawRect(left, top, width, height);
+                }
+
                 g2d.setFont(Client.CREDITS_FONT);
                 g2d.setColor(Color.RED);
                 g2d.drawString("Credits: " + player.getNumCredits(), getWidth() - 400, getHeight() - 100);
             }
         };
 
+        frame.addMouseMotionListener(new ClientMouseMotionListener());
         frame.addMouseListener(new ClientMouseListener());
         frame.addKeyListener(new ClientKeyListener());
         frame.addMouseWheelListener(new ClientMouseWheelListener());
@@ -111,6 +130,20 @@ public class Client {
         return new CoordinateTranslation((int)(xOffset*tileSize*zoom), (int)(yOffset*tileSize*zoom), tileSize*zoom, tileSize*zoom);
     }
 
+    private class ClientMouseMotionListener implements MouseMotionListener {
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            if (mousePressX != -1) {
+                mouseX = e.getX();
+                mouseY = e.getY();
+            }
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+        }
+    }
+
     private class ClientMouseListener implements MouseListener {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -118,18 +151,39 @@ public class Client {
 
         @Override
         public void mousePressed(MouseEvent e) {
+            mousePressX = e.getX();
+            mousePressY = e.getY();
+            mousePressType = e.getButton();
+            mouseX = e.getX();
+            mouseY = e.getY();
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
             Point.Double pt = getCoordinateTranslation().toWorldCoordinates(new Point(e.getX(), e.getY()));
             if (e.getButton() == MouseEvent.BUTTON1) {
-                Entity underMouse = getWorld().getEntityAt(pt);
-                if (underMouse != null) {
-                    boolean canSelect = !(underMouse instanceof OwnedEntity) || ((OwnedEntity)underMouse).getPlayerNumber() == player.getPlayerNumber();
-                    if (canSelect) {
-                        selectedIds.clear();
-                        selectedIds.add(underMouse.id);
+                if (mousePressX == -1 || mousePressType != MouseEvent.BUTTON1) {
+                    Entity underMouse = getWorld().getEntityAt(pt);
+                    if (underMouse != null) {
+                        boolean canSelect = !(underMouse instanceof OwnedEntity) || ((OwnedEntity)underMouse).getPlayerNumber() == player.getPlayerNumber();
+                        if (canSelect) {
+                            selectedIds.clear();
+                            selectedIds.add(underMouse.id);
+                        }
+                    }
+                } else {
+                    Point.Double pressPt = getCoordinateTranslation().toWorldCoordinates(new Point(mousePressX, mousePressY));
+                    double left = Math.min(pressPt.getX(), pt.getX());
+                    double top = Math.min(pressPt.getY(), pt.getY());
+                    double width = Math.max(pressPt.getX(), pt.getX()) - left;
+                    double height = Math.max(pressPt.getY(), pt.getY()) - top;
+                    Entity[] underMouse = getWorld().getEntitiesIn(new Rectangle.Double(left, top, width, height));
+                    selectedIds.clear();
+                    for (Entity selected : underMouse) {
+                        boolean canSelect = !(selected instanceof OwnedEntity) || ((OwnedEntity)selected).getPlayerNumber() == player.getPlayerNumber();
+                        if (canSelect) {
+                            selectedIds.add(selected.id);
+                        }
                     }
                 }
             } else if (e.getButton() == MouseEvent.BUTTON3) {
@@ -147,6 +201,10 @@ public class Client {
                     }
                 }
             }
+
+            mousePressX = -1;
+            mousePressY = -1;
+            mousePressType = -1;
         }
 
         @Override
