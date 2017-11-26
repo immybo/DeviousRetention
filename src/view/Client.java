@@ -22,6 +22,7 @@ public class Client {
     private static final double MIN_ZOOM = 0.1;
     private static final double MAX_ZOOM = 10;
     private static final double ZOOM_CHANGE_MULTIPLIER = 1.2;
+    private static final Font CREDITS_FONT = new Font("Arial", Font.BOLD, 50);
 
     private JFrame frame;
     private JPanel panel;
@@ -68,6 +69,10 @@ public class Client {
                     }
                 }
                 g2d.setStroke(oldStroke);
+
+                g2d.setFont(Client.CREDITS_FONT);
+                g2d.setColor(Color.RED);
+                g2d.drawString("Credits: " + player.getNumCredits(), getWidth() - 400, getHeight() - 100);
             }
         };
 
