@@ -40,23 +40,11 @@ public class Main {
         world.addEntity(building);
 
         Server server = new Server(world);
-        STCConnection stc = new STCConnection(server);
-        server.addClient(stc);
-
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Client client = new Client(World.NULL_WORLD);
-        CTSConnection cts = new CTSConnection(client);
-        client.setServer(cts);
+        launchClient(server);
+        launchClient(server);
 
         server.updateClients();
         world.tick();
-
-        cts.send(new TrainAction(building.id, EntityManager.UNIT.TEST_UNIT));
 
         Timer timer = new Timer(TICK_TIME_MS, new ActionListener(){
             @Override
@@ -66,5 +54,13 @@ public class Main {
             }
         });
         timer.start();
+    }
+
+    private static void launchClient(Server server) {
+        STCConnection stc = new STCConnection(server);
+        server.addClient(stc);
+        Client client = new Client(World.NULL_WORLD);
+        CTSConnection cts = new CTSConnection(client);
+        client.setServer(cts);
     }
 }
