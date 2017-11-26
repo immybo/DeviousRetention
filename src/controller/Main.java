@@ -1,6 +1,7 @@
 package controller;
 
 import model.Board;
+import model.Player;
 import model.entity.*;
 import view.Client;
 import model.Tile;
@@ -20,7 +21,11 @@ import java.awt.event.ActionListener;
 public class Main {
     public static final int TICK_TIME_MS = 50;
 
+    private static int currentPlayerNumber;
+
     public static void main(String[] args) {
+        currentPlayerNumber = 0;
+
         EntityManager.initialise();
 
         Tile[][] tiles = new Tile[10][10];
@@ -59,7 +64,7 @@ public class Main {
     private static void launchClient(Server server) {
         STCConnection stc = new STCConnection(server);
         server.addClient(stc);
-        Client client = new Client(World.NULL_WORLD);
+        Client client = new Client(World.NULL_WORLD, new Player(currentPlayerNumber++));
         CTSConnection cts = new CTSConnection(client);
         client.setServer(cts);
     }

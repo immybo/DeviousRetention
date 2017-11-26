@@ -109,7 +109,7 @@ public abstract class Unit extends OwnedEntity {
     public boolean canAttack(Entity other) {
         if (!(other instanceof OwnedEntity)) {
             return false;
-        } else if (((OwnedEntity)other).getPlayer() == getPlayer()) {
+        } else if (((OwnedEntity)other).getPlayerNumber() == getPlayerNumber()) {
             return false;
         } else {
             return true;

@@ -3,6 +3,7 @@ package view;
 import controller.AttackAction;
 import controller.MoveAction;
 import model.Entity;
+import model.Player;
 import model.World;
 import model.entity.Building;
 import model.entity.OwnedEntity;
@@ -26,6 +27,7 @@ public class Client {
     private JPanel panel;
     private World world;
     private CTSConnection server = null;
+    private Player player;
 
     private java.util.List<Integer> selectedIds;
 
@@ -34,13 +36,14 @@ public class Client {
     private int tileSize;
     private double zoom;
 
-    public Client(World world) {
+    public Client(World world, Player player) {
         this.world = world;
         this.xOffset = 0;
         this.yOffset = 0;
         this.zoom = 1;
         this.tileSize = 200;
         this.selectedIds = new ArrayList<Integer>();
+        this.player = player;
 
         frame = new JFrame();
         panel = new JPanel() {
@@ -56,10 +59,13 @@ public class Client {
                 g2d.setStroke(new BasicStroke(5));
                 for (Integer i : getSelected()) {
                     Entity e = getWorld().getEntityByID(i);
-                    g2d.setColor(e.getPlayerColor());
-                    Rectangle.Double bounds = e.getBounds();
-                    Rectangle screenBounds = translation.toScreenCoordinates(bounds);
-                    g2d.drawRect(screenBounds.x, screenBounds.y, screenBounds.width, screenBounds.height);
+                    if (e instanceof OwnedEntity) {
+                        OwnedEntity ownedE = (OwnedEntity)e;
+                        g2d.setColor(Player.getPlayerColor(ownedE.getPlayerNumber()));
+                        Rectangle.Double bounds = e.getBounds();
+                        Rectangle screenBounds = translation.toScreenCoordinates(bounds);
+                        g2d.drawRect(screenBounds.x, screenBounds.y, screenBounds.width, screenBounds.height);
+                    }
                 }
                 g2d.setStroke(oldStroke);
             }
@@ -113,8 +119,11 @@ public class Client {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 Entity underMouse = getWorld().getEntityAt(pt);
                 if (underMouse != null) {
-                    selectedIds.clear();
-                    selectedIds.add(underMouse.id);
+                    boolean canSelect = !(underMouse instanceof OwnedEntity) || ((OwnedEntity)underMouse).getPlayerNumber() == player.getPlayerNumber();
+                    if (canSelect) {
+                        selectedIds.clear();
+                        selectedIds.add(underMouse.id);
+                    }
                 }
             } else if (e.getButton() == MouseEvent.BUTTON3) {
                 if (server == null) {

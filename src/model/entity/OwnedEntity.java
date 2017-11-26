@@ -19,16 +19,8 @@ public abstract class OwnedEntity extends Entity {
         this.health = maxHealth;
     }
 
-    public int getPlayer() {
+    public int getPlayerNumber() {
         return playerNumber;
-    }
-
-    @Override
-    public Color getPlayerColor() {
-        if (playerNumber >= PLAYER_COLORS.length) {
-            return super.getPlayerColor();
-        }
-        return PLAYER_COLORS[playerNumber];
     }
 
     public void changeHealth(int difference) {

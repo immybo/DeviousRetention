@@ -67,7 +67,7 @@ public abstract class Building extends OwnedEntity {
             if (currentTrainTick >= finalTick) {
                 EntityManager.UNIT unitType = trainQueue.poll();
                 Point.Double spawnPoint = getUnitSpawnCoordinates();
-                world.addEntity(EntityManager.instantiate(unitType, spawnPoint.x, spawnPoint.y, this.getPlayer()));
+                world.addEntity(EntityManager.instantiate(unitType, spawnPoint.x, spawnPoint.y, this.getPlayerNumber()));
                 currentTrainTick = 0;
             }
         }

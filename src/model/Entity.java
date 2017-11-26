@@ -96,10 +96,6 @@ public abstract class Entity implements Serializable {
 
     }
 
-    public Color getPlayerColor() {
-        return Color.BLACK;
-    }
-
     /**
      * Returns the straight-line distance between this and
      * another entity.
