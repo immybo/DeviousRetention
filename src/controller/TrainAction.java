@@ -7,7 +7,7 @@ import model.entity.EntityManager;
 /**
  * Created by Robert Campbell on 28/10/2017.
  */
-public class TrainAction implements Action {
+public class TrainAction extends Action {
     private final int buildingId;
     private final EntityManager.UNIT unitType;
 

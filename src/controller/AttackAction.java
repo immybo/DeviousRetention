@@ -8,7 +8,7 @@ import model.entity.Unit;
 /**
  * Created by Robert Campbell on 27/10/2017.
  */
-public class AttackAction implements Action {
+public class AttackAction extends Action {
     private final int attackerId;
     private final int defenderId;
 
