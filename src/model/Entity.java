@@ -118,4 +118,14 @@ public abstract class Entity implements Serializable {
         // termination criteria being within that range of other.
         return new Point.Double(other.getX() - range, other.getY());
     }
+
+    /**
+     * Returns the actions which this entity can perform. This actions
+     * will be shown to the player as buttons when the entity is selected.
+     * For example, a building automatically has actions to train all of
+     * its trainable units.
+     */
+    public Action[] getActions() {
+        return new Action[0];
+    }
 }
