@@ -1,8 +1,6 @@
 package view;
 
-import controller.AttackAction;
-import controller.MoveAction;
-import controller.TrainAction;
+import controller.*;
 import model.Entity;
 import model.Player;
 import model.World;
@@ -29,6 +27,8 @@ public class Client {
 
     private JFrame frame;
     private JPanel panel;
+    private JPanel infoPanel;
+    private JPanel selectionPanel;
     private World world;
     private CTSConnection server = null;
     private Player player;
@@ -89,19 +89,48 @@ public class Client {
                     int height = Math.max(mousePressY, mouseY) - top;
                     g2d.drawRect(left, top, width, height);
                 }
-
-                g2d.setFont(Client.CREDITS_FONT);
-                g2d.setColor(Color.RED);
-                g2d.drawString("Credits: " + player.getNumCredits(), getWidth() - 400, getHeight() - 100);
             }
         };
+
+        infoPanel = new JPanel() {
+            @Override
+            public void paint(Graphics g) {
+                super.paint(g);
+                Graphics2D g2d = (Graphics2D)g;
+
+                g2d.setColor(Color.WHITE);
+                g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
+
+                int x = 20;
+                int y = 100;
+
+                g2d.setFont(Client.CREDITS_FONT);
+                g2d.setColor(Color.BLACK);
+                g2d.drawString("[empire name]", x, y);
+
+                y += 100;
+
+                g2d.drawString("Credits: " + player.getNumCredits(), x, y);
+
+                y += 200;
+            }
+        };
+
+        selectionPanel = new JPanel();
+
+        JPanel rightPanel = new JPanel();
+        rightPanel.setPreferredSize(new Dimension(500, 1080));
+        rightPanel.add(infoPanel);
+        rightPanel.add(selectionPanel);
 
         frame.addMouseMotionListener(new ClientMouseMotionListener());
         frame.addMouseListener(new ClientMouseListener());
         frame.addKeyListener(new ClientKeyListener());
         frame.addMouseWheelListener(new ClientMouseWheelListener());
 
-        frame.add(panel);
+        frame.setLayout(new BorderLayout());
+        frame.add(panel, BorderLayout.CENTER);
+        frame.add(rightPanel, BorderLayout.EAST);
         frame.setMinimumSize(new Dimension(1920, 1080));
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -167,8 +196,7 @@ public class Client {
                     if (underMouse != null) {
                         boolean canSelect = !(underMouse instanceof OwnedEntity) || ((OwnedEntity)underMouse).getPlayerNumber() == player.getPlayerNumber();
                         if (canSelect) {
-                            selectedIds.clear();
-                            selectedIds.add(underMouse.id);
+                            select(new Entity[]{underMouse});
                         }
                     }
                 } else {
@@ -178,13 +206,7 @@ public class Client {
                     double width = Math.max(pressPt.getX(), pt.getX()) - left;
                     double height = Math.max(pressPt.getY(), pt.getY()) - top;
                     Entity[] underMouse = getWorld().getEntitiesIn(new Rectangle.Double(left, top, width, height));
-                    selectedIds.clear();
-                    for (Entity selected : underMouse) {
-                        boolean canSelect = !(selected instanceof OwnedEntity) || ((OwnedEntity)selected).getPlayerNumber() == player.getPlayerNumber();
-                        if (canSelect) {
-                            selectedIds.add(selected.id);
-                        }
-                    }
+                    select(underMouse);
                 }
             } else if (e.getButton() == MouseEvent.BUTTON3) {
                 if (server == null) {
@@ -269,5 +291,45 @@ public class Client {
             zoom *= Math.pow(ZOOM_CHANGE_MULTIPLIER, -rotAmount);
             zoom = zoom < MIN_ZOOM ? MIN_ZOOM : zoom > MAX_ZOOM ? MAX_ZOOM : zoom;
         }
+    }
+
+    private void select(Entity[] toSelect) {
+        selectedIds.clear();
+        for (Entity e : toSelect) {
+            selectedIds.add(e.id);
+        }
+
+        checkSelectedPanel();
+    }
+
+    private void checkSelectedPanel() {
+        selectionPanel.removeAll();
+
+        // Draw the selected panel for one of the selected buildings
+        Building[] selected = getSelectedBuildings();
+        Building toDraw = null;
+        for (Building b : selected) {
+            if (b.getPlayerNumber() == player.getPlayerNumber()) {
+                toDraw = b;
+                break;
+            }
+        }
+
+        if (toDraw == null ) {
+            return; // We don't *need* to draw anything
+        }
+
+
+    }
+
+    private Building[] getSelectedBuildings() {
+        java.util.List<Building> buildings = new ArrayList<Building>();
+        for (Integer i : getSelected()) {
+            Entity e = world.getEntityByID(i);
+            if (e instanceof Building) {
+                buildings.add((Building)e);
+            }
+        }
+        return buildings.toArray(new Building[0]);
     }
 }
