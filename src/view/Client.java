@@ -4,10 +4,7 @@ import controller.*;
 import model.Entity;
 import model.Player;
 import model.World;
-import model.entity.Building;
-import model.entity.EntityManager;
-import model.entity.OwnedEntity;
-import model.entity.Unit;
+import model.entity.*;
 import network.CTSConnection;
 import network.STCConnection;
 import util.CoordinateTranslation;
@@ -31,7 +28,6 @@ public class Client {
     private JPanel selectionPanel;
     private World world;
     private CTSConnection server = null;
-    private Player player;
 
     private java.util.List<Integer> selectedIds;
 
@@ -47,14 +43,16 @@ public class Client {
     private int mouseX = -1;
     private int mouseY = -1;
 
-    public Client(World world, Player player) {
+    private final int playerNumber;
+
+    public Client(World world, int playerNumber) {
         this.world = world;
         this.xOffset = 0;
         this.yOffset = 0;
         this.zoom = 1;
         this.tileSize = 200;
         this.selectedIds = new ArrayList<Integer>();
-        this.player = player;
+        this.playerNumber = playerNumber;
 
         frame = new JFrame();
         panel = new JPanel() {
@@ -110,7 +108,9 @@ public class Client {
 
                 y += 100;
 
-                g2d.drawString("Credits: " + player.getNumCredits(), x, y);
+                // It can be null if we haven't received anything from the server yet.
+                if (getWorld().getPlayer(playerNumber) != null)
+                    g2d.drawString("Credits: " + getWorld().getPlayer(playerNumber).getNumCredits(), x, y);
 
                 y += 200;
             }
@@ -120,8 +120,10 @@ public class Client {
 
         JPanel rightPanel = new JPanel();
         rightPanel.setPreferredSize(new Dimension(500, 1080));
-        rightPanel.add(infoPanel);
-        rightPanel.add(selectionPanel);
+        rightPanel.setLayout(new BorderLayout());
+        infoPanel.setPreferredSize(new Dimension(500, 800));
+        rightPanel.add(infoPanel, BorderLayout.NORTH);
+        rightPanel.add(selectionPanel, BorderLayout.SOUTH);
 
         frame.addMouseMotionListener(new ClientMouseMotionListener());
         frame.addMouseListener(new ClientMouseListener());
@@ -194,7 +196,7 @@ public class Client {
                 if (mousePressX == -1 || mousePressType != MouseEvent.BUTTON1) {
                     Entity underMouse = getWorld().getEntityAt(pt);
                     if (underMouse != null) {
-                        boolean canSelect = !(underMouse instanceof OwnedEntity) || ((OwnedEntity)underMouse).getPlayerNumber() == player.getPlayerNumber();
+                        boolean canSelect = !(underMouse instanceof OwnedEntity) || ((OwnedEntity)underMouse).getPlayerNumber() == playerNumber;
                         if (canSelect) {
                             select(new Entity[]{underMouse});
                         }
@@ -217,6 +219,8 @@ public class Client {
                         Entity selected = getWorld().getEntityByID(id);
                         if (entAt != null && selected instanceof Unit && ((Unit)selected).canAttack(entAt)) {
                             server.send(new AttackAction(id, entAt.id));
+                        } else if (entAt != null && selected instanceof Unit && entAt instanceof Resource) {
+                            server.send(new GatherAction(id, entAt.id));
                         } else {
                             server.send(new MoveAction(id, pt));
                         }
@@ -266,10 +270,10 @@ public class Client {
                     Entity selected = getWorld().getEntityByID(id);
                     if (selected instanceof Building) {
                         Building selectedB = (Building)selected;
-                        if (selectedB.getPlayerNumber() == player.getPlayerNumber()) {
+                        if (selectedB.getPlayerNumber() == playerNumber) {
                             try {
                                 EntityManager.UNIT toTrain = selectedB.trainableUnits()[0];
-                                if (player.spendCredits(EntityManager.getUnitCost(toTrain))) {
+                                if (world.getPlayer(playerNumber).spendCredits(EntityManager.getUnitCost(toTrain))) {
                                     server.send(new TrainAction(id, toTrain));
                                 } else {
                                     // Show not enough credits to user TODO
@@ -309,7 +313,7 @@ public class Client {
         Building[] selected = getSelectedBuildings();
         Building toDraw = null;
         for (Building b : selected) {
-            if (b.getPlayerNumber() == player.getPlayerNumber()) {
+            if (b.getPlayerNumber() == playerNumber) {
                 toDraw = b;
                 break;
             }

@@ -42,9 +42,11 @@ public class Main {
         Unit unit = new TestUnit(0.5, 0.5, 0);
         Unit unit2 = new TestUnit(1.5, 0.5, 1);
         Building building = new TestBuilding(3, 3, 0);
+        Resource resource = new Resource(4.5, 4.5, 0.3, 500, 2);
         world.addEntity(unit);
         world.addEntity(unit2);
         world.addEntity(building);
+        world.addEntity(resource);
 
         Server server = new Server(world);
         launchClient(server);
@@ -67,8 +69,9 @@ public class Main {
         Player player = new Player(currentPlayerNumber++);
         player.earnCredits(10000);
         STCConnection stc = new STCConnection(server);
+        server.addPlayer(player);
         server.addClient(stc);
-        Client client = new Client(World.NULL_WORLD, player);
+        Client client = new Client(World.NULL_WORLD, player.getPlayerNumber());
         CTSConnection cts = new CTSConnection(client);
         client.setServer(cts);
     }

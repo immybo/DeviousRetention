@@ -1,11 +1,12 @@
 package model;
 
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * Created by Robert Campbell on 26/11/2017.
  */
-public class Player {
+public class Player implements Serializable {
     private final static Color[] playerColors = {
             Color.BLUE,
             Color.RED,

@@ -26,4 +26,8 @@ public class Resource extends Entity {
     public double getEfficiency() {
         return efficiency;
     }
+
+    public void takeCredits(int num) {
+        currentAmount -= num;
+    }
 }

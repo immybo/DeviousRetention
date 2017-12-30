@@ -21,11 +21,26 @@ public class World implements Serializable {
     private List<Entity> entitiesToAdd;
     private List<Integer> entitiesToRemove;
 
+    private List<Player> players;
+
     public World(Board board) {
         this.board = board;
         this.entities = new ArrayList<Entity>();
         this.entitiesToAdd = new ArrayList<Entity>();
         this.entitiesToRemove = new ArrayList<Integer>();
+        this.players = new ArrayList<Player>();
+    }
+
+    public void addPlayer(Player player) {
+        players.add(player);
+    }
+    public Player getPlayer(int playerNumber) {
+        for (Player p : players) {
+            if (p.getPlayerNumber() == playerNumber) {
+                return p;
+            }
+        }
+        return null;
     }
 
     public void addEntity(Entity entity) {

@@ -1,5 +1,6 @@
 package controller;
 
+import model.Player;
 import model.World;
 import model.entity.Unit;
 import network.STCConnection;
@@ -23,6 +24,10 @@ public class Server {
 
     public void addClient(STCConnection connection) {
         clients.add(connection);
+    }
+
+    public void addPlayer(Player player) {
+        world.addPlayer(player);
     }
 
     public void updateClients() {

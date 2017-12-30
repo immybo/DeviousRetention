@@ -1,6 +1,7 @@
 package model.entity;
 
 import model.Entity;
+import model.Player;
 import model.World;
 
 import java.awt.*;
@@ -13,6 +14,7 @@ import java.lang.reflect.Constructor;
 public abstract class Unit extends OwnedEntity {
     private Point.Double movePoint = null;
     private OwnedEntity target = null;
+    private Resource gatherTarget = null;
     private double movementSpeed;
     private double range;
     private double attackCounter;
@@ -32,7 +34,7 @@ public abstract class Unit extends OwnedEntity {
      * this point until it gets close enough.
      */
     public void setMovePoint(Point.Double newPoint) {
-        clearTarget();
+        clearAllTargets();
         setMovePointNoCancel(newPoint);
     }
 
@@ -40,17 +42,22 @@ public abstract class Unit extends OwnedEntity {
         this.movePoint = newPoint;
     }
 
-    public void clearMovePoint() {
-        this.movePoint = null;
-    }
-
     public void setTarget(OwnedEntity target) {
-        clearMovePoint();
+        clearAllTargets();
         this.target = target;
         this.attackCounter = 0;
     }
 
-    public void clearTarget() { this.target = null; }
+    public void clearAllTargets() {
+        this.target = null;
+        this.gatherTarget = null;
+        this.movePoint = null;
+    }
+
+    public void setGatherTarget(Resource target) {
+        clearAllTargets();
+        this.gatherTarget = target;
+    }
 
     @Override
     public void tick(World world) {
@@ -67,6 +74,10 @@ public abstract class Unit extends OwnedEntity {
         if (target != null) {
             attackTick(world);
         }
+
+        if (gatherTarget != null) {
+            gatherTick(world);
+        }
     }
 
     private void attackTick(World world) {
@@ -77,12 +88,33 @@ public abstract class Unit extends OwnedEntity {
             return;
         }
 
-        clearMovePoint(); // Since we may have been moving towards our target
+        this.movePoint = null; // Since we may have been moving towards our target
         if (attackCounter < attackTime) {
             attackCounter++;
         } else {
             attackCounter = 0;
             performAttack(target);
+        }
+    }
+
+    private void gatherTick(World world) {
+        double distance = this.distanceTo(gatherTarget);
+        double maxRange = gatherTarget.getSize()/2 + this.getSize()/2;
+        if (distance > maxRange) {
+            // Move to be within range
+            setMovePointNoCancel(closestPoint(gatherTarget, maxRange));
+            return;
+        }
+
+        this.movePoint = null; // Since we may have been moving towards our target
+
+        Player p = world.getPlayer(this.getPlayerNumber());
+        if (gatherTarget.getRemainingCredits() >= gatherTarget.getEfficiency()) {
+            p.earnCredits((int)gatherTarget.getEfficiency());
+            gatherTarget.takeCredits((int)gatherTarget.getEfficiency());
+        } else {
+            p.earnCredits(gatherTarget.getRemainingCredits());
+            gatherTarget.takeCredits(gatherTarget.getRemainingCredits());
         }
     }
 
@@ -97,7 +129,7 @@ public abstract class Unit extends OwnedEntity {
         double distance = Math.sqrt(moveX*moveX + moveY*moveY);
         if (distance <= movementSpeed) {
             this.moveBy(world.getBoard(), moveX, moveY);
-            clearMovePoint();
+            this.movePoint = null;
             return;
         }
 
