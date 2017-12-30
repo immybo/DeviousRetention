@@ -3,6 +3,7 @@ package controller;
 import model.Board;
 import model.Player;
 import model.entity.*;
+import model.tile.MountainTile;
 import view.Client;
 import model.Tile;
 import model.World;
@@ -34,6 +35,7 @@ public class Main {
                 tiles[i][j] = new GrassTile();
             }
         }
+        tiles[5][5] = new MountainTile();
         Board board = new Board(tiles);
 
         World world = new World(board);

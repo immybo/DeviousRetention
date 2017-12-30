@@ -1,5 +1,6 @@
 package model;
 
+import model.tile.GrassTile;
 import util.CoordinateTranslation;
 
 import java.awt.*;
@@ -27,6 +28,10 @@ public class Board implements Serializable {
         return tiles[y][x];
     }
 
+    public Tile getTile(Point point) {
+        return getTile(point.x, point.y);
+    }
+
     public int getWidth() {
         return width;
     }
@@ -42,7 +47,10 @@ public class Board implements Serializable {
             for (int j = 0; j < getHeight(); j++) {
                 // Tile tile = getTile(i, j);
                 Point topLeft = translation.toScreenCoordinates(new Point.Double(i, j));
-                g.setColor(Color.GREEN);
+                if (getTile(i,j) instanceof GrassTile)
+                    g.setColor(Color.GREEN);
+                else
+                    g.setColor(Color.GRAY);
                 g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
                 g.setColor(Color.BLACK);
                 g.drawRect(topLeft.x, topLeft.y, size.x, size.y);

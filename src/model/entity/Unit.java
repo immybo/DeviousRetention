@@ -103,7 +103,11 @@ public abstract class Unit extends OwnedEntity {
 
         double deltaX = moveX/(Math.abs(moveX)+Math.abs(moveY)) * movementSpeed;
         double deltaY = moveY/(Math.abs(moveX)+Math.abs(moveY)) * movementSpeed;
-        this.moveBy(world.getBoard(), deltaX, deltaY);
+
+        boolean collided = this.moveBy(world.getBoard(), deltaX, deltaY);
+        if (collided) {
+            this.movePoint = null;
+        }
     }
 
     public boolean canAttack(Entity other) {

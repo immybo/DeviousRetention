@@ -49,10 +49,47 @@ public abstract class Entity implements Serializable {
 
     /**
      * Moves by a given amount, constrained to remain within
-     * the given board.
+     * the given board. If we would collide with any tiles,
+     * "bounces" us back out of those collisions and returns true.
+     * Otherwise, returns false.
      */
-    public void moveBy(Board board, double x, double y) {
-        moveBy(x, y);
+    public boolean moveBy(Board board, double x, double y) {
+        boolean ret = false;
+
+        // See if we'll collide with anything (and "bounce" back out of it if we would)
+        double dX = x;
+        double dY = y;
+        double ddX = -x / 10;
+        double ddY = -y / 10;
+        int i = 0;
+        boolean colliding = true;
+        while (colliding && i < 10) {
+            double newX = getX()+dX;
+            double newY = getY()+dY;
+            int top = (int)(newY-getSize()/2);
+            int bottom = (int)(newY+getSize()/2);
+            int left = (int)(newX-getSize()/2);
+            int right = (int)(newX+getSize()/2);
+            // Check the top-left, top-right, bottom-left, bottom-right for collisions
+            Point topLeft = new Point(left, top);
+            Point topRight = new Point(right, top);
+            Point bottomLeft = new Point(left, bottom);
+            Point bottomRight = new Point(right, bottom);
+
+            if (board.getTile(topLeft).collides() || board.getTile(topRight).collides() ||
+                    board.getTile(bottomLeft).collides() || board.getTile(bottomRight).collides()) {
+                colliding = true;
+                dX += ddX;
+                dY += ddY;
+                ret = true;
+            } else {
+                colliding = false;
+            }
+
+            i++;
+        }
+
+        moveBy(dX, dY);
 
         if (getX() < getSize()/2) {
             this.x = getSize()/2;
@@ -65,6 +102,8 @@ public abstract class Entity implements Serializable {
         } else if (getY() + getSize()/2 > board.getHeight()) {
             this.y = board.getHeight() - getSize()/2;
         }
+
+        return ret;
     }
 
     public void renderOn(Graphics g, CoordinateTranslation translation) {
