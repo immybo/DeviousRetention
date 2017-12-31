@@ -1,6 +1,7 @@
 package view;
 
 import controller.*;
+import controller.Action;
 import model.Entity;
 import model.Player;
 import model.World;
@@ -323,7 +324,11 @@ public class Client {
             return; // We don't *need* to draw anything
         }
 
-
+        for (Action a : toDraw.getActions()) {
+            selectionPanel.add(new ActionButton(server, a));
+        }
+        selectionPanel.revalidate();
+        selectionPanel.repaint();
     }
 
     private Building[] getSelectedBuildings() {

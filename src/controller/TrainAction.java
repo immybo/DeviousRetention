@@ -9,7 +9,7 @@ import model.entity.EntityManager;
  */
 public class TrainAction extends Action {
     private final int buildingId;
-    private final EntityManager.UNIT unitType;
+    public final EntityManager.UNIT unitType;
 
     public TrainAction(int buildingId, EntityManager.UNIT unitType) {
         this.buildingId = buildingId;

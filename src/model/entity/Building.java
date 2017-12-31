@@ -1,5 +1,7 @@
 package model.entity;
 
+import controller.Action;
+import controller.TrainAction;
 import model.World;
 
 import java.awt.*;
@@ -75,5 +77,15 @@ public abstract class Building extends OwnedEntity {
 
     private Point.Double getUnitSpawnCoordinates() {
         return new Point.Double(this.getX(), this.getY());
+    }
+
+    @Override
+    public Action[] getActions() {
+        Action[] actions = new Action[trainableUnits.length];
+        for (int i = 0; i < actions.length; i++) {
+            EntityManager.UNIT u = trainableUnits[i];
+            actions[i] = new TrainAction(id, u);
+        }
+        return actions;
     }
 }
