@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Client {
     private static final double KEY_MOVEMENT_SPEED = 1;
@@ -197,10 +198,7 @@ public class Client {
                 if (mousePressX == -1 || mousePressType != MouseEvent.BUTTON1) {
                     Entity underMouse = getWorld().getEntityAt(pt);
                     if (underMouse != null) {
-                        boolean canSelect = !(underMouse instanceof OwnedEntity) || ((OwnedEntity)underMouse).getPlayerNumber() == playerNumber;
-                        if (canSelect) {
-                            select(new Entity[]{underMouse});
-                        }
+                        trySelect(new Entity[]{underMouse});
                     }
                 } else {
                     Point.Double pressPt = getCoordinateTranslation().toWorldCoordinates(new Point(mousePressX, mousePressY));
@@ -208,8 +206,18 @@ public class Client {
                     double top = Math.min(pressPt.getY(), pt.getY());
                     double width = Math.max(pressPt.getX(), pt.getX()) - left;
                     double height = Math.max(pressPt.getY(), pt.getY()) - top;
-                    Entity[] underMouse = getWorld().getEntitiesIn(new Rectangle.Double(left, top, width, height));
-                    select(underMouse);
+
+
+                    // Treat a small rectangle as a click
+                    if (Math.abs(width) < 15 && Math.abs(height) < 15) {
+                        Entity underMouse = getWorld().getEntityAt(pt);
+                        if (underMouse != null) {
+                            trySelect(new Entity[]{underMouse});
+                        }
+                    } else {
+                        Entity[] underMouse = getWorld().getEntitiesIn(new Rectangle.Double(left, top, width, height));
+                        trySelect(underMouse);
+                    }
                 }
             } else if (e.getButton() == MouseEvent.BUTTON3) {
                 if (server == null) {
@@ -295,6 +303,42 @@ public class Client {
             int rotAmount = e.getWheelRotation();
             zoom *= Math.pow(ZOOM_CHANGE_MULTIPLIER, -rotAmount);
             zoom = zoom < MIN_ZOOM ? MIN_ZOOM : zoom > MAX_ZOOM ? MAX_ZOOM : zoom;
+        }
+    }
+
+    /**
+     * Selects the entities which can be selected out of the given list.
+     * - Does not select entities which can't be selected.
+     * - Does not select entities belonging to other players.
+     * - Does not select more than one type of entity (e.g. both buildings and units; preference given to units).
+     */
+    private void trySelect(Entity[] toTry) {
+        java.util.List<Entity> toSelectBuildings = new ArrayList<Entity>();
+        java.util.List<Entity> toSelectUnits = new ArrayList<Entity>();
+        for (Entity e : toTry) {
+            if (e instanceof OwnedEntity) {
+                boolean valid = true;
+                OwnedEntity oe = (OwnedEntity)e;
+                if (oe.getPlayerNumber() != playerNumber)
+                    valid = false;
+                else
+                    valid = true;
+
+                if (valid) {
+                    if (e instanceof Unit)
+                        toSelectUnits.add(e);
+                    else if (e instanceof Building)
+                        toSelectBuildings.add(e);
+                    else
+                        throw new IllegalStateException("Owned entity found which was neither building nor unit: " + e.getClass().getCanonicalName());
+                }
+            }
+        }
+
+        if (!toSelectUnits.isEmpty()) {
+            select(toSelectUnits.toArray(new Entity[0]));
+        } else if (!toSelectBuildings.isEmpty()) {
+            select(toSelectBuildings.toArray(new Entity[0]));
         }
     }
 
