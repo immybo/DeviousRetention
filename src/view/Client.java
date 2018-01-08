@@ -223,14 +223,31 @@ public class Client {
                 if (server == null) {
                     System.err.println("Unable to send movement action as client is not connected.");
                 } else {
-                    Entity entAt = getWorld().getEntityAt(pt);
+                    Entity[] entsAt = getWorld().getEntitiesAt(pt);
                     for (Integer id : selectedIds) {
                         Entity selected = getWorld().getEntityByID(id);
-                        if (entAt != null && selected instanceof Unit && ((Unit)selected).canAttack(entAt)) {
-                            server.send(new AttackAction(id, entAt.id));
-                        } else if (entAt != null && selected instanceof Unit && entAt instanceof Resource) {
-                            server.send(new GatherAction(id, entAt.id));
-                        } else {
+                        boolean foundAction = false;
+                        if (selected instanceof Unit) {
+                            for (Entity ent : entsAt) {
+                                if (((Unit)selected).canAttack(ent)) {
+                                    server.send(new AttackAction(id, ent.id));
+                                    foundAction = true;
+                                    break;
+                                }
+                            }
+
+                            if (!foundAction) {
+                                for (Entity ent : entsAt) {
+                                    if (ent instanceof Resource) {
+                                        server.send(new GatherAction(id, ent.id));
+                                        foundAction = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (!foundAction) {
                             server.send(new MoveAction(id, pt));
                         }
                     }

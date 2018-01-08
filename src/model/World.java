@@ -102,6 +102,16 @@ public class World implements Serializable {
         return null;
     }
 
+    public Entity[] getEntitiesAt(Point.Double point) {
+        List<Entity> ents = new ArrayList<Entity>();
+        for (Entity e : entities) {
+            if (e.getBounds().contains(point)) {
+                ents.add(e);
+            }
+        }
+        return ents.toArray(new Entity[0]);
+    }
+
     public Entity[] getEntitiesIn(Rectangle.Double rect) {
         List<Entity> ret = new ArrayList<Entity>();
         for (Entity e : entities) {
