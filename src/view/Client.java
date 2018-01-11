@@ -300,7 +300,9 @@ public class Client {
                         if (selectedB.getPlayerNumber() == playerNumber) {
                             try {
                                 EntityManager.UNIT toTrain = selectedB.trainableUnits()[0];
-                                if (world.getPlayer(playerNumber).spendCredits(EntityManager.getUnitCost(toTrain))) {
+                                // This isn't a foolproof check, so we have to check serverside before doing the action as well.
+                                // But, it means we can easily show them a failure message client side *most* of the time.
+                                if (world.getPlayer(playerNumber).getNumCredits() >= EntityManager.getUnitCost(toTrain)) {
                                     server.send(new TrainAction(id, toTrain));
                                 } else {
                                     // Show not enough credits to user TODO
