@@ -63,20 +63,29 @@ public abstract class Entity implements Serializable {
         double ddY = -y / 10;
         int i = 0;
         boolean colliding = true;
-        while (colliding && i <= 15) {
-            double newX = getX()+dX;
-            double newY = getY()+dY;
 
-            if (world.isColliding(this, newX, newY)) {
+        while (colliding && i <= 15) {
+            double newX = getX() + dX;
+            if (world.isColliding(this, newX, this.getY())) {
                 colliding = true;
                 dX += ddX;
+                ret = true;
+            } else {
+                colliding = false;
+            }
+        }
+
+        i = 0;
+        colliding = true;
+        while (colliding && i <= 15) {
+            double newY = getY() + dY;
+            if (world.isColliding(this, this.getX()+dX, newY)) {
+                colliding = true;
                 dY += ddY;
                 ret = true;
             } else {
                 colliding = false;
             }
-
-            i++;
         }
 
         moveBy(dX, dY);

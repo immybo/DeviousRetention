@@ -152,7 +152,7 @@ public class World implements Serializable {
             if (otherEntity == entity) continue;
             double xDistance = Math.abs(otherEntity.getX() - x);
             double yDistance = Math.abs(otherEntity.getY() - y);
-            double size = otherEntity.getSize()/2 + entity.getSize()/2;
+            double size = otherEntity.getSize()/2 + entity.getSize()/2 + 0.05;
             if (xDistance <= size && yDistance <= size) {
                 return true;
             }
