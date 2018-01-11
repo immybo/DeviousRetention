@@ -49,11 +49,11 @@ public abstract class Entity implements Serializable {
 
     /**
      * Moves by a given amount, constrained to remain within
-     * the given board. If we would collide with any tiles,
+     * the given board. If we would collide with anything,
      * "bounces" us back out of those collisions and returns true.
      * Otherwise, returns false.
      */
-    public boolean moveBy(Board board, double x, double y) {
+    public boolean moveBy(World world, double x, double y) {
         boolean ret = false;
 
         // See if we'll collide with anything (and "bounce" back out of it if we would)
@@ -63,21 +63,11 @@ public abstract class Entity implements Serializable {
         double ddY = -y / 10;
         int i = 0;
         boolean colliding = true;
-        while (colliding && i < 10) {
+        while (colliding && i <= 15) {
             double newX = getX()+dX;
             double newY = getY()+dY;
-            int top = (int)(newY-getSize()/2);
-            int bottom = (int)(newY+getSize()/2);
-            int left = (int)(newX-getSize()/2);
-            int right = (int)(newX+getSize()/2);
-            // Check the top-left, top-right, bottom-left, bottom-right for collisions
-            Point topLeft = new Point(left, top);
-            Point topRight = new Point(right, top);
-            Point bottomLeft = new Point(left, bottom);
-            Point bottomRight = new Point(right, bottom);
 
-            if (board.getTile(topLeft).collides() || board.getTile(topRight).collides() ||
-                    board.getTile(bottomLeft).collides() || board.getTile(bottomRight).collides()) {
+            if (world.isColliding(this, newX, newY)) {
                 colliding = true;
                 dX += ddX;
                 dY += ddY;
@@ -93,14 +83,14 @@ public abstract class Entity implements Serializable {
 
         if (getX() < getSize()/2) {
             this.x = getSize()/2;
-        } else if (getX() + getSize()/2 > board.getWidth()) {
-            this.x = board.getWidth() - getSize()/2;
+        } else if (getX() + getSize()/2 > world.getBoard().getWidth()) {
+            this.x = world.getBoard().getWidth() - getSize()/2;
         }
 
         if (getY() < getSize()/2) {
             this.y = getSize()/2;
-        } else if (getY() + getSize()/2 > board.getHeight()) {
-            this.y = board.getHeight() - getSize()/2;
+        } else if (getY() + getSize()/2 > world.getBoard().getHeight()) {
+            this.y = world.getBoard().getHeight() - getSize()/2;
         }
 
         return ret;

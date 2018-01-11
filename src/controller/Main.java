@@ -40,7 +40,7 @@ public class Main {
 
         World world = new World(board);
         Unit unit = new TestUnit(0.5, 0.5, 0);
-        Unit unit2 = new TestUnit(1.5, 0.5, 1);
+        Unit unit2 = new TestUnit(1.9, 0.5, 1);
         Building building = new TestBuilding(3, 3, 0);
         Resource resource = new Resource(4.5, 4.5, 0.3, 500, 2);
         world.addEntity(unit);

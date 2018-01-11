@@ -128,7 +128,7 @@ public abstract class Unit extends OwnedEntity {
 
         double distance = Math.sqrt(moveX*moveX + moveY*moveY);
         if (distance <= movementSpeed) {
-            this.moveBy(world.getBoard(), moveX, moveY);
+            this.moveBy(world, moveX, moveY);
             this.movePoint = null;
             return;
         }
@@ -136,7 +136,7 @@ public abstract class Unit extends OwnedEntity {
         double deltaX = moveX/(Math.abs(moveX)+Math.abs(moveY)) * movementSpeed;
         double deltaY = moveY/(Math.abs(moveX)+Math.abs(moveY)) * movementSpeed;
 
-        boolean collided = this.moveBy(world.getBoard(), deltaX, deltaY);
+        boolean collided = this.moveBy(world, deltaX, deltaY);
         if (collided) {
             this.movePoint = null;
         }

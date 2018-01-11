@@ -121,4 +121,43 @@ public class World implements Serializable {
         }
         return ret.toArray(new Entity[0]);
     }
+
+    /**
+     * Returns whether or not the given entity would be colliding with anything
+     * if it was at the given x and y coordinates.
+     */
+    public boolean isColliding(Entity entity, double x, double y) {
+        boolean isColliding = false;
+
+        int top = (int)(y-entity.getSize()/2);
+        int bottom = (int)(y+entity.getSize()/2);
+        int left = (int)(x-entity.getSize()/2);
+        int right = (int)(x+entity.getSize()/2);
+        // Check the top-left, top-right, bottom-left, bottom-right for collisions
+        Point topLeft = new Point(left, top);
+        Point topRight = new Point(right, top);
+        Point bottomLeft = new Point(left, bottom);
+        Point bottomRight = new Point(right, bottom);
+
+        isColliding |= board.getTile(topLeft).collides();
+        isColliding |= board.getTile(topRight).collides();
+        isColliding |= board.getTile(bottomLeft).collides();
+        isColliding |= board.getTile(bottomRight).collides();
+        if (isColliding) {
+            return true;
+        }
+
+        // This is pretty slow. There's probably a much better way to do it.
+        for (Entity otherEntity : entities) {
+            if (otherEntity == entity) continue;
+            if (otherEntity.getX() + otherEntity.getSize()/2 > x - entity.getSize()/2 &&
+                    otherEntity.getX() - otherEntity.getSize()/2 < x + entity.getSize()/2 &&
+                    otherEntity.getY() + otherEntity.getSize()/2 > y - entity.getSize()/2 &&
+                    otherEntity.getY() - otherEntity.getSize()/2 < y + entity.getSize()/2) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
