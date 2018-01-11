@@ -57,10 +57,11 @@ public class Client {
         this.playerNumber = playerNumber;
 
         frame = new JFrame();
+
         panel = new JPanel() {
             @Override
-            public void paint(Graphics g) {
-                super.paint(g);
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D)g;
                 CoordinateTranslation translation = getCoordinateTranslation();
                 getWorld().renderOn(g2d, translation);
@@ -94,8 +95,8 @@ public class Client {
 
         infoPanel = new JPanel() {
             @Override
-            public void paint(Graphics g) {
-                super.paint(g);
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D)g;
 
                 g2d.setColor(Color.WHITE);
