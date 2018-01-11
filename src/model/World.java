@@ -150,10 +150,10 @@ public class World implements Serializable {
         // This is pretty slow. There's probably a much better way to do it.
         for (Entity otherEntity : entities) {
             if (otherEntity == entity) continue;
-            if (otherEntity.getX() + otherEntity.getSize()/2 > x - entity.getSize()/2 &&
-                    otherEntity.getX() - otherEntity.getSize()/2 < x + entity.getSize()/2 &&
-                    otherEntity.getY() + otherEntity.getSize()/2 > y - entity.getSize()/2 &&
-                    otherEntity.getY() - otherEntity.getSize()/2 < y + entity.getSize()/2) {
+            double xDistance = Math.abs(otherEntity.getX() - x);
+            double yDistance = Math.abs(otherEntity.getY() - y);
+            double size = otherEntity.getSize()/2 + entity.getSize()/2;
+            if (xDistance <= size && yDistance <= size) {
                 return true;
             }
         }
