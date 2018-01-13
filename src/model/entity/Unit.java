@@ -13,6 +13,8 @@ import java.lang.reflect.Constructor;
  */
 public abstract class Unit extends OwnedEntity {
     private Point.Double movePoint = null;
+    private Point.Double[] movePointSteps = null;
+    private int currentMovePointStep = 0;
     private OwnedEntity target = null;
     private Resource gatherTarget = null;
     private double movementSpeed;
@@ -52,6 +54,7 @@ public abstract class Unit extends OwnedEntity {
         this.target = null;
         this.gatherTarget = null;
         this.movePoint = null;
+        this.movePointSteps = null;
     }
 
     public void setGatherTarget(Resource target) {
@@ -123,20 +126,40 @@ public abstract class Unit extends OwnedEntity {
     }
 
     private void moveTick(World world) {
+        // If we haven't done any path finding yet, do it now.
+        if (this.movePointSteps == null) {
+            this.movePointSteps = world.getPath(new Point.Double(this.getX(), this.getY()), movePoint, this);
+            if (this.movePointSteps == null) {
+                // We have no path so just try and go straight there
+                this.movePointSteps = new Point.Double[]{ new Point.Double(movePoint.getX(), movePoint.getY()) };
+            }
+            this.currentMovePointStep = 0;
+        }
+
+        if (this.currentMovePointStep >= this.movePointSteps.length) {
+            clearAllTargets();
+            return;
+        }
+
+        Point.Double movePoint = this.movePointSteps[this.currentMovePointStep];
+
         double moveX = movePoint.x - this.getX();
         double moveY = movePoint.y - this.getY();
 
         double distance = Math.sqrt(moveX*moveX + moveY*moveY);
         if (distance <= movementSpeed) {
             this.moveBy(world, moveX, moveY);
-            this.movePoint = null;
+            this.currentMovePointStep++;
             return;
         }
 
         double deltaX = moveX/(Math.abs(moveX)+Math.abs(moveY)) * movementSpeed;
         double deltaY = moveY/(Math.abs(moveX)+Math.abs(moveY)) * movementSpeed;
 
-        this.moveBy(world, deltaX, deltaY);
+        boolean collided = this.moveBy(world, deltaX, deltaY);
+        if (collided) {
+            this.movePointSteps = null; // Recalculate the path next time
+        }
     }
 
     public boolean canAttack(Entity other) {

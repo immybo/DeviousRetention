@@ -5,7 +5,7 @@ import util.CoordinateTranslation;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -13,6 +13,8 @@ import java.util.List;
  * the tiles.
  */
 public class World implements Serializable {
+    public static final double PATHFINDING_GRANULARITY = 0.25;
+
     public static final World NULL_WORLD = new World(new Board(new Tile[][]{new Tile[]{new GrassTile()}}));
 
     private final Board board;
@@ -152,12 +154,126 @@ public class World implements Serializable {
             if (otherEntity == entity) continue;
             double xDistance = Math.abs(otherEntity.getX() - x);
             double yDistance = Math.abs(otherEntity.getY() - y);
-            double size = otherEntity.getSize()/2 + entity.getSize()/2 + 0.05;
-            if (xDistance <= size && yDistance <= size) {
+            double size = otherEntity.getSize()/2 + entity.getSize()/2;
+            if (xDistance < size && yDistance < size) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Returns a set of points representing a path from the given start point
+     * to the given end point. The points are inclusive of startPoint and endPoint.
+     *
+     * Note that this assumes there is a valid path, and that endPoint is a valid
+     * position.
+     *
+     * For detecting collisions, the given size is used, with the current point being
+     * the center.
+     */
+    public Point.Double[] getPath(Point.Double startPoint, Point.Double endPoint, Entity entity) {
+        Point.Double startPointMiddle = new Point.Double((int)startPoint.x + PATHFINDING_GRANULARITY, (int)startPoint.y + PATHFINDING_GRANULARITY);
+        Point.Double endPointMiddle = new Point.Double((int)endPoint.x + PATHFINDING_GRANULARITY, (int)endPoint.y + PATHFINDING_GRANULARITY);
+
+        // Yeah we're defining a class inside a method. Deal with it.
+        class AStarNode implements Comparable<AStarNode> {
+            AStarNode(Point.Double point, AStarNode from, double costTo) {
+                this.point = point;
+                this.from = from;
+                this.costTo = costTo;
+                this.heuristicCost = point.distance(endPoint);
+            }
+
+            Point.Double point;
+            AStarNode from;
+            double costTo;
+            double heuristicCost;
+
+            @Override
+            public int compareTo(AStarNode o) {
+                double diff = (this.costTo + this.heuristicCost) - (o.costTo + o.heuristicCost);
+                return diff < 0 ? -1 : diff == 0 ? 0 : 1;
+            }
+
+            @Override
+            public boolean equals(Object other) {
+                if (other instanceof AStarNode) {
+                    if (((AStarNode)other).point.equals(this.point)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        // We do this on the granularity of tiles for simplicity and speed
+
+        // A*
+        List<AStarNode> visited = new ArrayList<AStarNode>();
+        java.util.Queue<AStarNode> fringe = new PriorityQueue<AStarNode>();
+
+        fringe.add(new AStarNode(startPointMiddle, null, 0));
+
+        while (!fringe.isEmpty()) {
+            AStarNode current = fringe.poll();
+            if (current.point.distance(endPointMiddle) < PATHFINDING_GRANULARITY*2) {
+                List<Point.Double> points = new ArrayList<Point.Double>();
+                while (current.from != null) {
+                    points.add(current.point);
+                    current = current.from;
+                }
+                Collections.reverse(points);
+                return points.toArray(new Point.Double[0]);
+            }
+
+            visited.add(current);
+
+            Point.Double[] neighbourPoints = new Point.Double[] {
+                    new Point.Double(current.point.x + PATHFINDING_GRANULARITY, current.point.y),
+                    new Point.Double(current.point.x - PATHFINDING_GRANULARITY, current.point.y),
+                    new Point.Double(current.point.x, current.point.y + PATHFINDING_GRANULARITY),
+                    new Point.Double(current.point.x, current.point.y - PATHFINDING_GRANULARITY),
+                    new Point.Double(current.point.x + PATHFINDING_GRANULARITY, current.point.y + PATHFINDING_GRANULARITY),
+                    new Point.Double(current.point.x - PATHFINDING_GRANULARITY, current.point.y + PATHFINDING_GRANULARITY),
+                    new Point.Double(current.point.x + PATHFINDING_GRANULARITY, current.point.y - PATHFINDING_GRANULARITY),
+                    new Point.Double(current.point.x - PATHFINDING_GRANULARITY, current.point.y - PATHFINDING_GRANULARITY)
+            };
+
+            for (Point.Double neighbourPoint : neighbourPoints) {
+                if (neighbourPoint.x - entity.getSize()/2 < 0 || neighbourPoint.y - entity.getSize()/2 < 0 || neighbourPoint.x + entity.getSize()/2 >= board.getWidth() || neighbourPoint.y + entity.getSize()/2 >= board.getHeight()) {
+                    continue;
+                }
+
+                if (isColliding(entity, neighbourPoint.x, neighbourPoint.y)) {
+                    continue;
+                }
+
+                AStarNode neighbour = new AStarNode(neighbourPoint, current, current.costTo + current.point.distance(neighbourPoint));
+
+                if (visited.contains(neighbour)) {
+                    continue;
+                }
+
+                // Two nodes are equal if  they share the same point, so...
+                if (fringe.contains(neighbour)) {
+                    for (AStarNode otherNeighbour : fringe) {
+                        if (otherNeighbour.equals(neighbour)) {
+                            // Only replace it if our path is shorter
+                            if (neighbour.costTo < otherNeighbour.costTo) {
+                                fringe.remove(otherNeighbour);
+                                fringe.add(neighbour);
+                            }
+                            break;
+                        }
+                    }
+                } else {
+                    fringe.add(neighbour);
+                }
+            }
+        }
+
+        return null;
     }
 }
