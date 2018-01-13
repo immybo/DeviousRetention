@@ -39,7 +39,6 @@ public class EntityManager {
 
     private void initUnits() {
         unitTypes = new HashMap<UNIT, Constructor<? extends Unit>>();
-        registerUnit(UNIT.TEST_UNIT, getUnitConstructor(TestUnit.class), 100);
     }
 
     private void initBuildings() {

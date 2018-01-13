@@ -11,7 +11,7 @@ import java.lang.reflect.Constructor;
  * An entity which is owned by a player, which can be moved around and can perform actions
  * such as attacking or healing.
  */
-public abstract class Unit extends OwnedEntity {
+public class Unit extends OwnedEntity {
     private Point.Double movePoint = null;
     private Point.Double[] movePointSteps = null;
     private int currentMovePointStep = 0;
@@ -22,12 +22,24 @@ public abstract class Unit extends OwnedEntity {
     private double attackCounter;
     private double attackTime = 10;
     private int damage;
+    private Entity.Ability[] abilities;
 
-    public Unit(double x, double y, double size, double range, int damage, int maxHealth, int playerNumber, double movementSpeed) {
+    public Unit(double x, double y, double size, double range, int damage, int maxHealth, int playerNumber, double movementSpeed, Entity.Ability[] abilities) {
         super(x, y, size, playerNumber, maxHealth);
         this.movementSpeed = movementSpeed;
         this.range = range;
         this.damage = damage;
+        this.abilities = abilities;
+    }
+
+    public boolean can(Entity.Ability doThis) {
+        for (Entity.Ability a : abilities) {
+            if (doThis == a) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -45,9 +57,11 @@ public abstract class Unit extends OwnedEntity {
     }
 
     public void setTarget(OwnedEntity target) {
-        clearAllTargets();
-        this.target = target;
-        this.attackCounter = 0;
+        if (can(Ability.ATTACK)) {
+            clearAllTargets();
+            this.target = target;
+            this.attackCounter = 0;
+        }
     }
 
     public void clearAllTargets() {
@@ -58,8 +72,10 @@ public abstract class Unit extends OwnedEntity {
     }
 
     public void setGatherTarget(Resource target) {
-        clearAllTargets();
-        this.gatherTarget = target;
+        if (can(Ability.GATHER)) {
+            clearAllTargets();
+            this.gatherTarget = target;
+        }
     }
 
     @Override

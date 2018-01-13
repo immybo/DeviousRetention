@@ -1,12 +1,9 @@
 package controller;
 
-import model.Board;
-import model.Player;
+import model.*;
 import model.entity.*;
 import model.tile.MountainTile;
 import view.Client;
-import model.Tile;
-import model.World;
 import model.tile.GrassTile;
 import network.CTSConnection;
 import network.STCConnection;
@@ -38,13 +35,13 @@ public class Main {
         tiles[5][5] = new MountainTile();
         Board board = new Board(tiles);
 
+        UnitTemplate testUnit = new UnitTemplate(new Entity.Ability[]{Entity.Ability.ATTACK, Entity.Ability.GATHER}, 1, 2, 10, 50, 1, 100);
+
         World world = new World(board);
-        Unit unit = new TestUnit(0.5, 0.5, 0);
-        Unit unit2 = new TestUnit(1.9, 0.5, 1);
         Building building = new TestBuilding(3, 3, 0);
         Resource resource = new Resource(4.5, 4.5, 0.3, 500, 2);
-        world.addEntity(unit);
-        world.addEntity(unit2);
+        world.addEntity(testUnit.create(world, 0, 0.5, 0.5));
+        world.addEntity(testUnit.create(world, 1, 1.5, 1.5));
         world.addEntity(building);
         world.addEntity(resource);
 

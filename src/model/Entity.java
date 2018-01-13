@@ -11,6 +11,11 @@ import java.io.Serializable;
  * Something on the layer above tiles, can be interacted with by other entities.
  */
 public abstract class Entity implements Serializable {
+    public enum Ability {
+        ATTACK,
+        GATHER
+    }
+
     private static int nextID = 0;
 
     public final int id;
