@@ -1,0 +1,34 @@
+package model.entity;
+
+import model.Entity;
+import model.World;
+
+import java.io.Serializable;
+
+public class ResourceTemplate implements EntityTemplate, Serializable {
+    private double size;
+    private int totalAmount;
+    private double efficiency;
+    private String name;
+
+    public ResourceTemplate(String name, double size, int totalAmount, double efficiency) {
+        this.size = size;
+        this.totalAmount = totalAmount;
+        this.efficiency = efficiency;
+    }
+
+    @Override
+    public Resource create(World world, int playerNumber, double x, double y) {
+        return new Resource(x, y, size, totalAmount, efficiency);
+    }
+
+    @Override
+    public int getCost() {
+        return 0;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+}

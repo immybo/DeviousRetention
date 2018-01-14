@@ -3,10 +3,12 @@ package model.entity;
 import model.Entity;
 import model.World;
 
+import java.io.Serializable;
+
 /**
  * Defines a template for a unit, which can be created.
  */
-public class UnitTemplate implements EntityTemplate {
+public class UnitTemplate implements EntityTemplate, Serializable {
 
     private Entity.Ability[] abilities;
 
@@ -16,8 +18,11 @@ public class UnitTemplate implements EntityTemplate {
     private int damage;
     private double size;
     private int maxHealth;
+    private String name;
+    private int cost;
 
-    public UnitTemplate(Entity.Ability[] abilities, double movementSpeed, double range, double attackTime, int damage, double size, int maxHealth) {
+    public UnitTemplate(String name, Entity.Ability[] abilities, double movementSpeed, double range, double attackTime, int damage, double size, int maxHealth, int cost) {
+        this.name = name;
         this.abilities = abilities;
         this.movementSpeed = movementSpeed;
         this.range = range;
@@ -25,10 +30,21 @@ public class UnitTemplate implements EntityTemplate {
         this.damage = damage;
         this.size = size;
         this.maxHealth = maxHealth;
+        this.cost = cost;
     }
 
     @Override
     public Unit create(World world, int playerNumber, double x, double y) {
         return new Unit(x, y, size, range, damage, maxHealth, playerNumber, movementSpeed, abilities);
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int getCost() {
+        return cost;
     }
 }

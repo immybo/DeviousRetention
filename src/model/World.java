@@ -172,8 +172,15 @@ public class World implements Serializable {
      *
      * For detecting collisions, the given size is used, with the current point being
      * the center.
+     *
+     * The given range is the maximum distance from the given endPoint at which the final
+     * point will be. If it's -1, it will be set to a reasonable default.
      */
-    public Point.Double[] getPath(Point.Double startPoint, Point.Double endPoint, Entity entity) {
+    public Point.Double[] getPath(Point.Double startPoint, Point.Double endPoint, Entity entity, double range) {
+        if (range == -1) {
+            range = PATHFINDING_GRANULARITY*2;
+        }
+
         Point.Double startPointMiddle = new Point.Double((int)startPoint.x + PATHFINDING_GRANULARITY, (int)startPoint.y + PATHFINDING_GRANULARITY);
         Point.Double endPointMiddle = new Point.Double((int)endPoint.x + PATHFINDING_GRANULARITY, (int)endPoint.y + PATHFINDING_GRANULARITY);
 
@@ -218,7 +225,7 @@ public class World implements Serializable {
 
         while (!fringe.isEmpty()) {
             AStarNode current = fringe.poll();
-            if (current.point.distance(endPointMiddle) < PATHFINDING_GRANULARITY*2) {
+            if (current.point.distance(endPointMiddle) < range) {
                 List<Point.Double> points = new ArrayList<Point.Double>();
                 while (current.from != null) {
                     points.add(current.point);

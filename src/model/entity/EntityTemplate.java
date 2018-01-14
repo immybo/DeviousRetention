@@ -11,4 +11,6 @@ import model.World;
  */
 public interface EntityTemplate {
     public Entity create(World world, int playerNumber, double x, double y);
+    public int getCost();
+    public String getName();
 }

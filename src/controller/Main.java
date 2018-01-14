@@ -24,8 +24,6 @@ public class Main {
     public static void main(String[] args) {
         currentPlayerNumber = 0;
 
-        EntityManager.initialise();
-
         Tile[][] tiles = new Tile[10][10];
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[0].length; j++) {
@@ -35,15 +33,15 @@ public class Main {
         tiles[5][5] = new MountainTile();
         Board board = new Board(tiles);
 
-        UnitTemplate testUnit = new UnitTemplate(new Entity.Ability[]{Entity.Ability.ATTACK, Entity.Ability.GATHER}, 1, 2, 10, 50, 1, 100);
+        UnitTemplate testUnit = new UnitTemplate("TestUnit", new Entity.Ability[]{Entity.Ability.ATTACK, Entity.Ability.GATHER}, 1, 2, 10, 50, 1, 100, 100);
+        BuildingTemplate testBuilding = new BuildingTemplate("TestBuilding", new Entity.Ability[]{}, 5, 5, 50, 2, 500, 300, new UnitTemplate[]{testUnit}, new int[]{10});
+        ResourceTemplate testResource = new ResourceTemplate("TestResource", 0.5, 1000, 1);
 
         World world = new World(board);
-        Building building = new TestBuilding(3, 3, 0);
-        Resource resource = new Resource(4.5, 4.5, 0.3, 500, 2);
         world.addEntity(testUnit.create(world, 0, 0.5, 0.5));
         world.addEntity(testUnit.create(world, 1, 1.5, 1.5));
-        world.addEntity(building);
-        world.addEntity(resource);
+        world.addEntity(testBuilding.create(world, 1, 3, 3));
+        world.addEntity(testResource.create(world, -1, 4.5, 4.5));
 
         Server server = new Server(world);
         launchClient(server);

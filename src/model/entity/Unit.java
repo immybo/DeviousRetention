@@ -118,10 +118,18 @@ public class Unit extends OwnedEntity {
 
     private void gatherTick(World world) {
         double distance = this.distanceTo(gatherTarget);
-        double maxRange = gatherTarget.getSize()/2 + this.getSize()/2;
+        double maxRange = gatherTarget.getSize()/2 + this.getSize()/2 + 0.5;
         if (distance > maxRange) {
+            if (this.movePoint == null) {
+                this.currentMovePointStep = 0;
+            }
             // Move to be within range
-            setMovePointNoCancel(closestPoint(gatherTarget, maxRange));
+            setMovePointNoCancel(new Point.Double(gatherTarget.getX(), gatherTarget.getY()));
+            this.movePointSteps = world.getPath(new Point.Double(this.getX(), this.getY()), movePoint, this, maxRange-0.5);
+            if (this.movePointSteps == null) {
+                // We have no path so just try and go straight there
+                this.movePointSteps = new Point.Double[]{ new Point.Double(movePoint.getX(), movePoint.getY()) };
+            }
             return;
         }
 
@@ -130,8 +138,8 @@ public class Unit extends OwnedEntity {
         Player p = world.getPlayer(this.getPlayerNumber());
         if (gatherTarget.getRemainingCredits() >= gatherTarget.getEfficiency()) {
             p.earnCredits((int)gatherTarget.getEfficiency());
-            gatherTarget.takeCredits((int)gatherTarget.getEfficiency());
         } else {
+            gatherTarget.takeCredits((int)gatherTarget.getEfficiency());
             p.earnCredits(gatherTarget.getRemainingCredits());
             gatherTarget.takeCredits(gatherTarget.getRemainingCredits());
         }
@@ -144,7 +152,7 @@ public class Unit extends OwnedEntity {
     private void moveTick(World world) {
         // If we haven't done any path finding yet, do it now.
         if (this.movePointSteps == null) {
-            this.movePointSteps = world.getPath(new Point.Double(this.getX(), this.getY()), movePoint, this);
+            this.movePointSteps = world.getPath(new Point.Double(this.getX(), this.getY()), movePoint, this, -1);
             if (this.movePointSteps == null) {
                 // We have no path so just try and go straight there
                 this.movePointSteps = new Point.Double[]{ new Point.Double(movePoint.getX(), movePoint.getY()) };
