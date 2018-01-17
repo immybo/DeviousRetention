@@ -33,8 +33,8 @@ public class Main {
         tiles[5][5] = new MountainTile();
         Board board = new Board(tiles);
 
-        UnitTemplate testUnit = new UnitTemplate("TestUnit", new Entity.Ability[]{Entity.Ability.ATTACK, Entity.Ability.GATHER}, 1, 2, 10, 50, 1, 100, 100);
-        BuildingTemplate testBuilding = new BuildingTemplate("TestBuilding", new Entity.Ability[]{}, 5, 5, 50, 2, 500, 300, new UnitTemplate[]{testUnit}, new int[]{10});
+        UnitTemplate testUnit = new UnitTemplate("TestUnit", new Entity.Ability[]{Entity.Ability.ATTACK, Entity.Ability.GATHER}, 1, 2, 10, 50, 0.1, 100, 100);
+        BuildingTemplate testBuilding = new BuildingTemplate("TestBuilding", new Entity.Ability[]{}, 5, 5, 50, 2, 500, 300, new UnitTemplate[]{testUnit, testUnit}, new int[]{10});
         ResourceTemplate testResource = new ResourceTemplate("TestResource", 0.5, 1000, 1);
 
         World world = new World(board);

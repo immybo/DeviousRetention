@@ -125,16 +125,16 @@ public class World implements Serializable {
     }
 
     /**
-     * Returns whether or not the given entity would be colliding with anything
+     * Returns whether or not something with the given size would be colliding with anything
      * if it was at the given x and y coordinates.
      */
-    public boolean isColliding(Entity entity, double x, double y) {
+    public boolean isColliding(double size, double x, double y) {
         boolean isColliding = false;
 
-        int top = (int)(y-entity.getSize()/2);
-        int bottom = (int)(y+entity.getSize()/2);
-        int left = (int)(x-entity.getSize()/2);
-        int right = (int)(x+entity.getSize()/2);
+        int top = (int)(y-size/2);
+        int bottom = (int)(y+size/2);
+        int left = (int)(x-size/2);
+        int right = (int)(x+size/2);
         // Check the top-left, top-right, bottom-left, bottom-right for collisions
         Point topLeft = new Point(left, top);
         Point topRight = new Point(right, top);
@@ -151,16 +151,75 @@ public class World implements Serializable {
 
         // This is pretty slow. There's probably a much better way to do it.
         for (Entity otherEntity : entities) {
-            if (otherEntity == entity) continue;
             double xDistance = Math.abs(otherEntity.getX() - x);
             double yDistance = Math.abs(otherEntity.getY() - y);
-            double size = otherEntity.getSize()/2 + entity.getSize()/2;
+            double avgSize = otherEntity.getSize()/2 + size/2;
+            if (xDistance < avgSize && yDistance < avgSize) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean isColliding(Entity e, double x, double y) {
+        boolean isColliding = false;
+
+        int top = (int)(y-e.getSize()/2);
+        int bottom = (int)(y+e.getSize()/2);
+        int left = (int)(x-e.getSize()/2);
+        int right = (int)(x+e.getSize()/2);
+        // Check the top-left, top-right, bottom-left, bottom-right for collisions
+        Point topLeft = new Point(left, top);
+        Point topRight = new Point(right, top);
+        Point bottomLeft = new Point(left, bottom);
+        Point bottomRight = new Point(right, bottom);
+
+        isColliding |= board.getTile(topLeft).collides();
+        isColliding |= board.getTile(topRight).collides();
+        isColliding |= board.getTile(bottomLeft).collides();
+        isColliding |= board.getTile(bottomRight).collides();
+        if (isColliding) {
+            return true;
+        }
+
+        // This is pretty slow. There's probably a much better way to do it.
+        for (Entity otherEntity : entities) {
+            if (otherEntity == e) continue;
+            double xDistance = Math.abs(otherEntity.getX() - x);
+            double yDistance = Math.abs(otherEntity.getY() - y);
+            double size = otherEntity.getSize()/2 + e.getSize()/2;
             if (xDistance < size && yDistance < size) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Returns (roughly) the nearest point to the given point which has no entities
+     * or collidable terrain within size/2 squares, or null if there was none found
+     * within the given maximum range.
+     */
+    public Point.Double getNearestEmptyPoint(double size, double x, double y, double maxRange) {
+        double bestRange = Double.MAX_VALUE;
+        Point.Double bestPoint = null;
+
+        for (double cX = x - maxRange; cX < x + maxRange; cX += PATHFINDING_GRANULARITY) {
+            for (double cY = y - maxRange; cY < y + maxRange; cY += PATHFINDING_GRANULARITY) {
+                if (!isColliding(size, cX, cY)) {
+                    Point.Double pt = new Point.Double(cX, cY);
+                    double range = pt.distance(x, y);
+                    if (range < bestRange) {
+                        bestRange = range;
+                        bestPoint = pt;
+                    }
+                }
+            }
+        }
+
+        return bestPoint;
     }
 
     /**

@@ -68,15 +68,15 @@ public class Building extends OwnedEntity {
             int finalTick = ticksToTrain(trainQueue.peek());
             if (currentTrainTick >= finalTick) {
                 UnitTemplate unitType = trainQueue.poll();
-                Point.Double spawnPoint = getUnitSpawnCoordinates();
+                Point.Double spawnPoint = getUnitSpawnCoordinates(world);
                 world.addEntity(unitType.create(world, this.getPlayerNumber(), spawnPoint.x, spawnPoint.y));
                 currentTrainTick = 0;
             }
         }
     }
 
-    private Point.Double getUnitSpawnCoordinates() {
-        return new Point.Double(this.getX(), this.getY());
+    private Point.Double getUnitSpawnCoordinates(World world) {
+        return world.getNearestEmptyPoint(0.2, this.getX(), this.getY(), this.getSize()/2 + 1.5);
     }
 
     @Override
