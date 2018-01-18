@@ -1,5 +1,6 @@
 package model.entity;
 
+import controller.Cost;
 import model.Entity;
 import model.World;
 
@@ -11,6 +12,6 @@ import model.World;
  */
 public interface EntityTemplate {
     public Entity create(World world, int playerNumber, double x, double y);
-    public int getCost();
+    public Cost getCost();
     public String getName();
 }

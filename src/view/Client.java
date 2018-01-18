@@ -302,7 +302,7 @@ public class Client {
                                 UnitTemplate toTrain = selectedB.trainableUnits()[0];
                                 // This isn't a foolproof check, so we have to check serverside before doing the action as well.
                                 // But, it means we can easily show them a failure message client side *most* of the time.
-                                if (world.getPlayer(playerNumber).getNumCredits() >= toTrain.getCost()) {
+                                if (world.getPlayer(playerNumber).getNumCredits() >= toTrain.getCost().creditCost) {
                                     server.send(new TrainAction(id, toTrain));
                                 } else {
                                     // Show not enough credits to user TODO

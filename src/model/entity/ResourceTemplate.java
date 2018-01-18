@@ -1,5 +1,6 @@
 package model.entity;
 
+import controller.Cost;
 import model.Entity;
 import model.World;
 
@@ -23,8 +24,8 @@ public class ResourceTemplate implements EntityTemplate, Serializable {
     }
 
     @Override
-    public int getCost() {
-        return 0;
+    public Cost getCost() {
+        return Cost.NULL_COST;
     }
 
     @Override

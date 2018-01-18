@@ -1,5 +1,7 @@
 package model;
 
+import controller.Cost;
+
 import java.awt.*;
 import java.io.Serializable;
 
@@ -47,12 +49,12 @@ public class Player implements Serializable {
         numCredits += num;
     }
 
-    public boolean spendCredits(int num) {
-        if (getNumCredits() < num) {
+    public boolean spendCredits(Cost cost) {
+        if (getNumCredits() < cost.creditCost) {
             return false;
         }
 
-        spendCreditsNoCheck(num);
+        spendCreditsNoCheck(cost.creditCost);
         return true;
     }
 

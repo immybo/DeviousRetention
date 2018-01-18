@@ -1,5 +1,6 @@
 package model.entity;
 
+import controller.Cost;
 import model.Entity;
 import model.World;
 
@@ -19,9 +20,9 @@ public class UnitTemplate implements EntityTemplate, Serializable {
     private double size;
     private int maxHealth;
     private String name;
-    private int cost;
+    private Cost cost;
 
-    public UnitTemplate(String name, Entity.Ability[] abilities, double movementSpeed, double range, double attackTime, int damage, double size, int maxHealth, int cost) {
+    public UnitTemplate(String name, Entity.Ability[] abilities, double movementSpeed, double range, double attackTime, int damage, double size, int maxHealth, Cost cost) {
         this.name = name;
         this.abilities = abilities;
         this.movementSpeed = movementSpeed;
@@ -44,7 +45,7 @@ public class UnitTemplate implements EntityTemplate, Serializable {
     }
 
     @Override
-    public int getCost() {
+    public Cost getCost() {
         return cost;
     }
 }
