@@ -207,20 +207,16 @@ public class Client {
                     Point.Double pressPt = getCoordinateTranslation().toWorldCoordinates(new Point(mousePressX, mousePressY));
                     double left = Math.min(pressPt.getX(), pt.getX());
                     double top = Math.min(pressPt.getY(), pt.getY());
-                    double width = Math.max(pressPt.getX(), pt.getX()) - left;
-                    double height = Math.max(pressPt.getY(), pt.getY()) - top;
+                    // The +0.001 means that a click can be counted as a drag
+                    double width = Math.max(pressPt.getX(), pt.getX()) - left + 0.001;
+                    double height = Math.max(pressPt.getY(), pt.getY()) - top + 0.001;
 
 
-                    // Treat a small rectangle as a click
-                    if (Math.abs(width) < 15 && Math.abs(height) < 15) {
-                        Entity underMouse = getWorld().getEntityAt(pt);
-                        if (underMouse != null) {
-                            trySelect(new Entity[]{underMouse});
-                        }
-                    } else {
-                        Entity[] underMouse = getWorld().getEntitiesIn(new Rectangle.Double(left, top, width, height));
-                        trySelect(underMouse);
-                    }
+                    Entity[] underMouse = getWorld().getEntitiesIn(new Rectangle.Double(left, top, width, height));
+                    trySelect(underMouse);
+
+                    mousePressX = -1;
+                    mousePressY = -1;
                 }
             } else if (e.getButton() == MouseEvent.BUTTON3) {
                 if (server == null) {
