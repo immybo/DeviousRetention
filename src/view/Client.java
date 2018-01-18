@@ -137,8 +137,10 @@ public class Client {
         frame.add(panel, BorderLayout.CENTER);
         frame.add(rightPanel, BorderLayout.EAST);
         frame.setMinimumSize(new Dimension(1920, 1080));
-        frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setUndecorated(true);
+        frame.pack();
         frame.setVisible(true);
         frame.repaint();
     }
