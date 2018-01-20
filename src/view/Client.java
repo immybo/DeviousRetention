@@ -27,6 +27,7 @@ public class Client {
     private JFrame frame;
     private JPanel panel;
     private JPanel infoPanel;
+    private JPanel buildingsPanel;
     private JPanel selectionPanel;
     private World world;
     private CTSConnection server = null;
@@ -44,6 +45,9 @@ public class Client {
 
     private int mouseX = -1;
     private int mouseY = -1;
+
+    private boolean isPlacingBuilding = false;
+    private BuildingTemplate placingBuilding = null;
 
     private final int playerNumber;
 
@@ -119,6 +123,8 @@ public class Client {
             }
         };
 
+        buildingsPanel = new JPanel();
+
         selectionPanel = new JPanel();
 
         JPanel rightPanel = new JPanel();
@@ -126,6 +132,7 @@ public class Client {
         rightPanel.setLayout(new BorderLayout());
         infoPanel.setPreferredSize(new Dimension(500, 800));
         rightPanel.add(infoPanel, BorderLayout.NORTH);
+        rightPanel.add(buildingsPanel, BorderLayout.CENTER);
         rightPanel.add(selectionPanel, BorderLayout.SOUTH);
 
         frame.addMouseMotionListener(new ClientMouseMotionListener());
@@ -151,6 +158,22 @@ public class Client {
 
     public void setWorld(World world) {
         this.world = world;
+
+        // Reset buttons for all the buildings we can build here incase the player has changed
+        buildingsPanel.removeAll();
+        for (BuildingTemplate bt : getWorld().getPlayer(playerNumber).getBuildable()) {
+            JButton buildButton = new JButton(bt.getName());
+            buildButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    isPlacingBuilding = true;
+                    placingBuilding = bt;
+                }
+            });
+            buildingsPanel.add(buildButton);
+        }
+
+        frame.revalidate();
         frame.repaint();
     }
 
@@ -197,7 +220,11 @@ public class Client {
         @Override
         public void mouseReleased(MouseEvent e) {
             Point.Double pt = getCoordinateTranslation().toWorldCoordinates(new Point(e.getX(), e.getY()));
-            if (e.getButton() == MouseEvent.BUTTON1) {
+            if (e.getButton() == MouseEvent.BUTTON1 && isPlacingBuilding) {
+                Point.Double pressPt = getCoordinateTranslation().toWorldCoordinates(new Point(mousePressX, mousePressY));
+                build(placingBuilding, pressPt.getX(), pressPt.getY());
+                isPlacingBuilding = false;
+            } else if (e.getButton() == MouseEvent.BUTTON1) {
                 if (mousePressX == -1 || mousePressType != MouseEvent.BUTTON1) {
                     Entity underMouse = getWorld().getEntityAt(pt);
                     if (underMouse != null) {
@@ -402,5 +429,12 @@ public class Client {
             }
         }
         return buildings.toArray(new Building[0]);
+    }
+
+    /**
+     * Places a specific building type at the given point
+     */
+    private void build(BuildingTemplate bt, double x, double y) {
+        server.send(new BuildAction(bt, playerNumber, x, y));
     }
 }

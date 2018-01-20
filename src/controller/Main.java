@@ -44,8 +44,8 @@ public class Main {
         world.addEntity(testResource.create(world, -1, 4.5, 4.5));
 
         Server server = new Server(world);
-        launchClient(server);
-        launchClient(server);
+        launchClient(server, new BuildingTemplate[]{testBuilding});
+        launchClient(server, new BuildingTemplate[]{testBuilding});
 
         server.updateClients();
         world.tick();
@@ -60,8 +60,8 @@ public class Main {
         timer.start();
     }
 
-    private static void launchClient(Server server) {
-        Player player = new Player(currentPlayerNumber++);
+    private static void launchClient(Server server, BuildingTemplate[] buildable) {
+        Player player = new Player(currentPlayerNumber++, buildable);
         player.earnCredits(10000);
         STCConnection stc = new STCConnection(server);
         server.addPlayer(player);
