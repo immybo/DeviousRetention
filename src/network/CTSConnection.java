@@ -4,6 +4,7 @@ import controller.Action;
 import view.Client;
 import model.World;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -56,7 +57,12 @@ public class CTSConnection {
         while (!server.isClosed()) {
             try {
                 World in = (World)input.readObject();
-                client.setWorld(in);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        client.setWorld(in);
+                    }
+                });
             } catch (IOException|ClassNotFoundException e) {
                 System.err.println("couldn't read object from client: " + e);
                 // No need to terminate here, we can keep going

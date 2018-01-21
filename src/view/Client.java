@@ -13,6 +13,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Client {
     private static final double KEY_MOVEMENT_SPEED = 1;
@@ -26,7 +27,7 @@ public class Client {
     private JPanel infoPanel;
     private JPanel buildingsPanel;
     private JPanel selectionPanel;
-    private World world;
+    private AtomicReference<World> world;
     private CTSConnection server = null;
 
     private java.util.List<Integer> selectedIds;
@@ -34,7 +35,7 @@ public class Client {
     private final int playerNumber;
 
     public Client(World world, int playerNumber) {
-        this.world = world;
+        this.world = new AtomicReference<World>(world);
         this.selectedIds = new ArrayList<Integer>();
         this.playerNumber = playerNumber;
 
@@ -61,8 +62,9 @@ public class Client {
                 y += 100;
 
                 // It can be null if we haven't received anything from the server yet.
-                if (getWorld().getPlayer(playerNumber) != null)
+                if (getWorld().getPlayer(playerNumber) != null) {
                     g2d.drawString("Credits: " + getWorld().getPlayer(playerNumber).getNumCredits(), x, y);
+                }
 
                 y += 200;
             }
@@ -83,16 +85,14 @@ public class Client {
         frame.addKeyListener(new ClientKeyListener());
         frame.addMouseWheelListener(new ClientMouseWheelListener());
 
-        frame.setLayout(new BorderLayout());
-        frame.add(gamePanel, BorderLayout.CENTER);
-        frame.add(rightPanel, BorderLayout.EAST);
+        Container pane = frame.getContentPane();
+        pane.setLayout(new BorderLayout());
+        pane.add(gamePanel, BorderLayout.CENTER);
+        pane.add(rightPanel, BorderLayout.EAST);
         frame.setMinimumSize(new Dimension(1920, 1080));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        frame.setUndecorated(true);
         frame.pack();
         frame.setVisible(true);
-        frame.repaint();
     }
 
     public void sendAction(Action a) {
@@ -110,27 +110,26 @@ public class Client {
     }
 
     public void setWorld(World world) {
-        this.world = world;
-
-        // Reset buttons for all the buildings we can build here incase the player has changed
-        buildingsPanel.removeAll();
-        for (BuildingTemplate bt : getWorld().getPlayer(playerNumber).getBuildable()) {
-            JButton buildButton = new JButton(bt.getName());
-            buildButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    gamePanel.setPlacingBuilding(bt);
-                }
-            });
-            buildingsPanel.add(buildButton);
+        this.world.set(world);
+        if (buildingsPanel.getComponents().length == 0) {
+            buildingsPanel.removeAll();
+            for (BuildingTemplate bt : getWorld().getPlayer(playerNumber).getBuildable()) {
+                JButton buildButton = new JButton(bt.getName());
+                buildButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        gamePanel.setPlacingBuilding(bt);
+                    }
+                });
+                buildingsPanel.add(buildButton);
+            }
+            frame.validate();
         }
-
-        frame.revalidate();
         frame.repaint();
     }
 
     public World getWorld() {
-        return world;
+        return world.get();
     }
 
     public Integer[] getSelected() {
@@ -172,7 +171,7 @@ public class Client {
                                 UnitTemplate toTrain = selectedB.trainableUnits()[0];
                                 // This isn't a foolproof check, so we have to check serverside before doing the action as well.
                                 // But, it means we can easily show them a failure message client side *most* of the time.
-                                if (world.getPlayer(playerNumber).getNumCredits() >= toTrain.getCost().creditCost) {
+                                if (getWorld().getPlayer(playerNumber).getNumCredits() >= toTrain.getCost().creditCost) {
                                     server.send(new TrainAction(id, toTrain));
                                 } else {
                                     // Show not enough credits to user TODO
@@ -224,14 +223,14 @@ public class Client {
         for (Action a : toDraw.getActions()) {
             selectionPanel.add(new ActionButton(server, a));
         }
-        selectionPanel.revalidate();
-        selectionPanel.repaint();
+
+        frame.validate();
     }
 
     private Building[] getSelectedBuildings() {
         java.util.List<Building> buildings = new ArrayList<Building>();
         for (Integer i : getSelected()) {
-            Entity e = world.getEntityByID(i);
+            Entity e = getWorld().getEntityByID(i);
             if (e instanceof Building) {
                 buildings.add((Building)e);
             }

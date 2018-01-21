@@ -9,9 +9,11 @@ import network.CTSConnection;
 import network.STCConnection;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.*;
 
 /**
  * Created by Robert Campbell on 10/10/2017.
@@ -45,12 +47,23 @@ public class Main {
 
         Server server = new Server(world);
         launchClient(server, new BuildingTemplate[]{testBuilding});
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         launchClient(server, new BuildingTemplate[]{testBuilding});
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         server.updateClients();
         world.tick();
 
-        Timer timer = new Timer(TICK_TIME_MS, new ActionListener(){
+        javax.swing.Timer timer = new Timer(TICK_TIME_MS, new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 world.tick();
@@ -66,8 +79,14 @@ public class Main {
         STCConnection stc = new STCConnection(server);
         server.addPlayer(player);
         server.addClient(stc);
-        Client client = new Client(World.NULL_WORLD, player.getPlayerNumber());
-        CTSConnection cts = new CTSConnection(client);
-        client.setServer(cts);
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                Client client = new Client(World.NULL_WORLD, player.getPlayerNumber());
+                CTSConnection cts = new CTSConnection(client);
+                client.setServer(cts);
+            }
+        });
     }
 }
