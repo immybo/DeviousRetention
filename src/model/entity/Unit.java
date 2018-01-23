@@ -3,6 +3,7 @@ package model.entity;
 import model.Entity;
 import model.Player;
 import model.World;
+import util.CoordinateTranslation;
 
 import java.awt.*;
 import java.lang.reflect.Constructor;
@@ -194,5 +195,9 @@ public class Unit extends OwnedEntity {
         } else {
             return true;
         }
+    }
+
+    public double getRange() {
+        return range;
     }
 }

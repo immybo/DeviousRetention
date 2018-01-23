@@ -87,8 +87,8 @@ public class GamePanel extends JPanel {
 
         // Draw a box around all of the selected entities
         Stroke oldStroke = g2d.getStroke();
-        g2d.setStroke(new BasicStroke(5));
         for (Integer i : client.getSelected()) {
+            g2d.setStroke(new BasicStroke(5));
             Entity e = client.getWorld().getEntityByID(i);
             if (e instanceof OwnedEntity) {
                 OwnedEntity ownedE = (OwnedEntity)e;
@@ -96,6 +96,19 @@ public class GamePanel extends JPanel {
                 Rectangle.Double bounds = e.getBounds();
                 Rectangle screenBounds = translation.toScreenCoordinates(bounds);
                 g2d.drawRect(screenBounds.x, screenBounds.y, screenBounds.width, screenBounds.height);
+
+                if (e instanceof Unit) {
+                    Unit u = (Unit)e;
+                    if (u.can(Entity.Ability.ATTACK)) {// Draw a circle around us to indicate range
+                        int radiusX = (int)(translation.getWorldToScreenMultiplier().getX() * u.getRange());
+                        int radiusY = (int)(translation.getWorldToScreenMultiplier().getY() * u.getRange());
+                        Point center = translation.toScreenCoordinates(new Point.Double(u.getX(), u.getY()));
+
+                        g2d.setColor(Player.getPlayerColor(u.getPlayerNumber()));
+                        g2d.setStroke(new BasicStroke(1));
+                        g2d.drawOval(center.x - radiusX, center.y - radiusY, radiusX * 2, radiusY * 2);
+                    }
+                }
             }
         }
         g2d.setStroke(oldStroke);
