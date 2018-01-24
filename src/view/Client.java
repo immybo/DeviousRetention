@@ -133,6 +133,20 @@ public class Client {
     }
 
     public Integer[] getSelected() {
+        // Make sure that they all still exist
+        java.util.List<Integer> toRemove = new ArrayList<Integer>();
+        for (Integer i : toRemove) {
+            try {
+                world.get().getEntityByID(i);
+            } catch (IllegalArgumentException e) {
+                toRemove.add(i);
+            }
+        }
+
+        for (Integer i : toRemove) {
+            selectedIds.remove(i);
+        }
+
         return selectedIds.toArray(new Integer[0]);
     }
 
