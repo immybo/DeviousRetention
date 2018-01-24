@@ -16,7 +16,7 @@ import java.util.Scanner;
  * A server-to-client network connection;
  */
 public class STCConnection {
-    public static final int LISTEN_PORT = 54234;
+    public static final int LISTEN_PORT = 62554;
 
     private final Server server;
     private Socket client;
