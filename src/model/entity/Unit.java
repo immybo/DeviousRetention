@@ -102,7 +102,7 @@ public class Unit extends OwnedEntity {
 
     private void attackTick(World world) {
         double distance = this.distanceTo(target);
-        if (distance < range) {
+        if (distance > range) {
             // Move to be within range
             setMovePointNoCancel(closestPoint(target, range));
             return;
