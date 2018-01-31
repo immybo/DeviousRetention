@@ -184,6 +184,7 @@ public class World implements Serializable {
         }
 
         // This is pretty slow. There's probably a much better way to do it.
+        // TODO use a quadtree / cached values
         for (Entity otherEntity : entities) {
             if (otherEntity == e) continue;
             double xDistance = Math.abs(otherEntity.getX() - x);
@@ -245,7 +246,11 @@ public class World implements Serializable {
         }
 
         Point.Double startPointMiddle = new Point.Double((int)startPoint.x + PATHFINDING_GRANULARITY, (int)startPoint.y + PATHFINDING_GRANULARITY);
-        Point.Double endPointMiddle = new Point.Double((int)endPoint.x + PATHFINDING_GRANULARITY, (int)endPoint.y + PATHFINDING_GRANULARITY);
+        Point.Double endPointReal = getNearestEmptyPoint(entity.getSize(), endPoint.x, endPoint.y, 3);
+        if (endPointReal == null) {
+            // We couldn't find an empty space, so I guess just don't move anywhere
+            return new Point.Double[0];
+        }
 
         // Yeah we're defining a class inside a method. Deal with it.
         class AStarNode implements Comparable<AStarNode> {
@@ -253,7 +258,7 @@ public class World implements Serializable {
                 this.point = point;
                 this.from = from;
                 this.costTo = costTo;
-                this.heuristicCost = point.distance(endPoint);
+                this.heuristicCost = point.distance(endPointReal);
             }
 
             Point.Double point;
@@ -288,7 +293,7 @@ public class World implements Serializable {
 
         while (!fringe.isEmpty()) {
             AStarNode current = fringe.poll();
-            if (current.point.distance(endPointMiddle) < range) {
+            if (current.point.distance(endPointReal) < range) {
                 List<Point.Double> points = new ArrayList<Point.Double>();
                 while (current.from != null) {
                     points.add(current.point);

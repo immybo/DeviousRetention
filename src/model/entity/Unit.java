@@ -104,6 +104,7 @@ public class Unit extends OwnedEntity {
         double distance = this.distanceTo(target);
         if (distance > range) {
             // Move to be within range
+            this.movePointSteps = null;
             setMovePointNoCancel(closestPoint(target, range));
             return;
         }
@@ -121,16 +122,9 @@ public class Unit extends OwnedEntity {
         double distance = this.distanceTo(gatherTarget);
         double maxRange = gatherTarget.getSize()/2 + this.getSize()/2 + 0.5;
         if (distance > maxRange) {
-            if (this.movePoint == null) {
-                this.currentMovePointStep = 0;
-            }
             // Move to be within range
+            this.movePointSteps = null;
             setMovePointNoCancel(new Point.Double(gatherTarget.getX(), gatherTarget.getY()));
-            this.movePointSteps = world.getPath(new Point.Double(this.getX(), this.getY()), movePoint, this, maxRange-0.5);
-            if (this.movePointSteps == null) {
-                // We have no path so just try and go straight there
-                this.movePointSteps = new Point.Double[]{ new Point.Double(movePoint.getX(), movePoint.getY()) };
-            }
             return;
         }
 
