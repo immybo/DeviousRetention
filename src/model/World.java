@@ -208,6 +208,10 @@ public class World implements Serializable {
 
         for (double cX = x - maxRange; cX < x + maxRange; cX += PATHFINDING_GRANULARITY) {
             for (double cY = y - maxRange; cY < y + maxRange; cY += PATHFINDING_GRANULARITY) {
+                if (cX-size/2 < 0 || cY-size/2 < 0 || cX+size/2 >= getBoard().getWidth() || cY+size/2 >= getBoard().getHeight()) {
+                    continue;
+                }
+
                 if (!isColliding(size, cX, cY)) {
                     Point.Double pt = new Point.Double(cX, cY);
                     double range = pt.distance(x, y);
