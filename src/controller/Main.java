@@ -92,8 +92,13 @@ public class Main {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                long startTime = System.currentTimeMillis();
                 world.tick();
+                long tickEnd = System.currentTimeMillis();
                 server.updateClients();
+                long updateTime = System.currentTimeMillis()-tickEnd;
+
+                System.out.println("Tick time: " + (tickEnd-startTime) + " ; Update time: " + updateTime);
             }
         }, 0, TICK_TIME_MS);
     }
