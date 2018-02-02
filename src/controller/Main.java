@@ -19,7 +19,7 @@ import java.util.*;
  * Created by Robert Campbell on 10/10/2017.
  */
 public class Main {
-    public static final int TICK_TIME_MS = 50;
+    public static final int TICK_TIME_MS = 16;
 
     private static int currentPlayerNumber;
 
@@ -88,14 +88,14 @@ public class Main {
         server.updateClients();
         world.tick();
 
-        javax.swing.Timer timer = new Timer(TICK_TIME_MS, new ActionListener(){
+        java.util.Timer timer = new java.util.Timer();
+        timer.schedule(new TimerTask() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void run() {
                 world.tick();
                 server.updateClients();
             }
-        });
-        timer.start();
+        }, 0, TICK_TIME_MS);
     }
 
     private static void launchClient(Server server, BuildingTemplate[] buildable) {

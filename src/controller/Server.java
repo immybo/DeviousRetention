@@ -17,6 +17,8 @@ public class Server {
     private List<STCConnection> clients;
     private World world;
 
+    private int i = 0;
+
     public Server(World world) {
         clients = new ArrayList<STCConnection>();
         this.world = world;
@@ -31,6 +33,12 @@ public class Server {
     }
 
     public void updateClients() {
+        if (i != 5) {
+            i++;
+            return;
+        }
+        i = 0;
+        // TODO speed this up; it takes about 80ms
         for (STCConnection client : clients) {
             client.send(world);
         }
