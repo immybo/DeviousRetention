@@ -54,6 +54,7 @@ public class Unit extends OwnedEntity {
     }
 
     private void setMovePointNoCancel(Point.Double newPoint) {
+        this.movePointSteps = null;
         this.movePoint = newPoint;
     }
 
@@ -65,13 +66,6 @@ public class Unit extends OwnedEntity {
         }
     }
 
-    public void clearAllTargets() {
-        this.target = null;
-        this.gatherTarget = null;
-        this.movePoint = null;
-        this.movePointSteps = null;
-    }
-
     public void setGatherTarget(Resource target) {
         if (can(Ability.GATHER)) {
             clearAllTargets();
@@ -79,23 +73,23 @@ public class Unit extends OwnedEntity {
         }
     }
 
+    public void clearAllTargets() {
+        this.target = null;
+        this.gatherTarget = null;
+        this.movePoint = null;
+        this.movePointSteps = null;
+    }
+
     @Override
     public void tick(World world) {
         super.tick(world);
 
-        // A unit can both move and attack every tick, but ordering it
-        // to do either clears the other one. This is used for when
-        // we're moving towards our target.
-
+        // Moving overrides other things in case we're moving towards our target
         if (movementSpeed != 0 && movePoint != null) {
             moveTick(world);
-        }
-
-        if (target != null) {
+        } else if (target != null) {
             attackTick(world);
-        }
-
-        if (gatherTarget != null) {
+        } else if (gatherTarget != null) {
             gatherTick(world);
         }
     }
@@ -106,11 +100,11 @@ public class Unit extends OwnedEntity {
             if (this.movePoint == null) {
                 // Move to be within range
                 setMovePointNoCancel(closestPoint(target, range));
+                moveTick(world);
             }
             return;
         }
 
-        this.movePoint = null; // Since we may have been moving towards our target
         if (attackCounter < attackTime) {
             attackCounter++;
         } else {
@@ -121,28 +115,17 @@ public class Unit extends OwnedEntity {
 
     private void gatherTick(World world) {
         double distance = this.distanceTo(gatherTarget);
-        double maxRange = gatherTarget.getSize()/2 + this.getSize()/2 + 0.5;
+        double maxRange = gatherTarget.getSize()/2 + this.getSize()/2 + 0.75;
         if (distance > maxRange) {
-            // Move to be within range
-            this.movePointSteps = null;
-            setMovePointNoCancel(new Point.Double(gatherTarget.getX(), gatherTarget.getY()));
+            if (this.movePoint == null) {
+                // Move to be within range
+                setMovePointNoCancel(new Point.Double(gatherTarget.getX(), gatherTarget.getY()));
+                moveTick(world);
+            }
             return;
         }
 
-        this.movePoint = null; // Since we may have been moving towards our target
-
-        Player p = world.getPlayer(this.getPlayerNumber());
-        if (gatherTarget.getRemainingCredits() >= gatherTarget.getEfficiency()) {
-            p.earnCredits((int)gatherTarget.getEfficiency());
-        } else {
-            gatherTarget.takeCredits((int)gatherTarget.getEfficiency());
-            p.earnCredits(gatherTarget.getRemainingCredits());
-            gatherTarget.takeCredits(gatherTarget.getRemainingCredits());
-        }
-    }
-
-    private void performAttack(OwnedEntity target) {
-        target.changeHealth(-this.damage);
+        performGather(world, gatherTarget);
     }
 
     private void moveTick(World world) {
@@ -157,7 +140,8 @@ public class Unit extends OwnedEntity {
         }
 
         if (this.currentMovePointStep >= this.movePointSteps.length) {
-            clearAllTargets();
+            this.movePoint = null;
+            this.movePointSteps = null;
             return;
         }
 
@@ -180,6 +164,21 @@ public class Unit extends OwnedEntity {
         if (collided) {
             this.movePointSteps = null; // Recalculate the path next time
         }
+    }
+
+    private void performGather(World world, Resource gatherTarget) {
+        Player p = world.getPlayer(this.getPlayerNumber());
+        if (gatherTarget.getRemainingCredits() >= gatherTarget.getEfficiency()) {
+            p.earnCredits((int)gatherTarget.getEfficiency());
+        } else {
+            gatherTarget.takeCredits((int)gatherTarget.getEfficiency());
+            p.earnCredits(gatherTarget.getRemainingCredits());
+            gatherTarget.takeCredits(gatherTarget.getRemainingCredits());
+        }
+    }
+
+    private void performAttack(OwnedEntity target) {
+        target.changeHealth(-this.damage);
     }
 
     public boolean canAttack(Entity other) {
