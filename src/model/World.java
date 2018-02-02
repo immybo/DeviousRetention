@@ -70,6 +70,10 @@ public class World implements Serializable {
         }
     }
 
+    public void setEntities(Entity[] entities) {
+        this.entities = Arrays.asList(entities);
+    }
+
     public void tick() {
         for (Entity e : entitiesToAdd) {
             entities.add(e);

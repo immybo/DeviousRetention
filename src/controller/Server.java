@@ -28,19 +28,17 @@ public class Server {
         clients.add(connection);
     }
 
+    public World getWorld() {
+        return world;
+    }
+
     public void addPlayer(Player player) {
         world.addPlayer(player);
     }
 
     public void updateClients() {
-        if (i != 5) {
-            i++;
-            return;
-        }
-        i = 0;
-        // TODO speed this up; it takes about 80ms
         for (STCConnection client : clients) {
-            client.send(world);
+            client.send(world.getEntities());
         }
     }
 

@@ -111,6 +111,7 @@ public class Main {
                 Client client = new Client(World.NULL_WORLD, player.getPlayerNumber());
                 CTSConnection cts = new CTSConnection(client);
                 client.setServer(cts);
+                stc.send(server.getWorld());
             }
         });
     }

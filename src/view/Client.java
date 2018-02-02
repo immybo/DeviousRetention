@@ -128,6 +128,11 @@ public class Client {
         frame.repaint();
     }
 
+    public void updateEntities(Entity[] entities) {
+        world.get().setEntities(entities);
+        frame.repaint();
+    }
+
     public World getWorld() {
         return world.get();
     }

@@ -2,6 +2,7 @@ package network;
 
 import controller.Action;
 import controller.Server;
+import model.Entity;
 import model.World;
 
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -83,6 +85,16 @@ public class STCConnection {
             out.reset();
         } catch (IOException e) {
             System.err.println("unable to send world to clients: " + e);
+        }
+    }
+
+    public void send(Entity[] entities) {
+        try {
+            out.writeObject(entities);
+            out.flush();
+            out.reset();
+        } catch (IOException e) {
+            System.err.println("unable to send entity list to clients: " + e);
         }
     }
 }

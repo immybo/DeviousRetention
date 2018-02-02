@@ -1,6 +1,7 @@
 package network;
 
 import controller.Action;
+import model.Entity;
 import view.Client;
 import model.World;
 
@@ -56,13 +57,22 @@ public class CTSConnection {
 
         while (!server.isClosed()) {
             try {
-                World in = (World)input.readObject();
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        client.setWorld(in);
-                    }
-                });
+                Object in = input.readObject();
+                if (in instanceof World) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            client.setWorld((World)in);
+                        }
+                    });
+                } else {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            client.updateEntities((Entity[])in);
+                        }
+                    });
+                }
             } catch (IOException|ClassNotFoundException e) {
                 System.err.println("couldn't read object from client: " + e);
                 // No need to terminate here, we can keep going
