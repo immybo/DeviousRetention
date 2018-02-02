@@ -187,6 +187,10 @@ public class World implements Serializable {
                     return true;
                 }
             }
+
+            if (getBoard().getTile(toCheck.x, toCheck.y).collides()) {
+                return true;
+            }
         }
         return false;
     }
