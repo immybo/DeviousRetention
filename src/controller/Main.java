@@ -97,8 +97,11 @@ public class Main {
                 long tickEnd = System.currentTimeMillis();
                 server.updateClients();
                 long updateTime = System.currentTimeMillis()-tickEnd;
+                long tickTime = tickEnd-startTime;
 
-                System.out.println("Tick time: " + (tickEnd-startTime) + " ; Update time: " + updateTime);
+                if (updateTime + tickTime > TICK_TIME_MS) {
+                    System.out.println("LONG TICK. Update: " + updateTime + "ms; tick: " + tickTime + "ms.");
+                }
             }
         }, 0, TICK_TIME_MS);
     }
