@@ -99,7 +99,7 @@ public class Unit extends OwnedEntity {
         if (distance > range) {
             if (this.movePoint == null) {
                 // Move to be within range
-                setMovePointNoCancel(closestPoint(target, range));
+                setMovePointNoCancel(new Point.Double(target.getX(), target.getY()));
                 moveTick(world);
             }
             return;

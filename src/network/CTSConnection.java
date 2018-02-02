@@ -2,6 +2,7 @@ package network;
 
 import controller.Action;
 import model.Entity;
+import model.Player;
 import view.Client;
 import model.World;
 
@@ -65,11 +66,18 @@ public class CTSConnection {
                             client.setWorld((World)in);
                         }
                     });
-                } else {
+                } else if (in instanceof Entity[]) {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             client.updateEntities((Entity[])in);
+                        }
+                    });
+                } else if (in instanceof Player[]) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            client.updatePlayers((Player[])in);
                         }
                     });
                 }

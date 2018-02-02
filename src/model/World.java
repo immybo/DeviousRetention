@@ -48,6 +48,12 @@ public class World implements Serializable {
         }
         return null;
     }
+    public Player[] getPlayers() {
+        return players.toArray(new Player[0]);
+    }
+    public void setPlayers(Player[] players) {
+        this.players = Arrays.asList(players);
+    }
 
     public void addEntity(Entity entity) {
         entitiesToAdd.add(entity);

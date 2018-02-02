@@ -133,6 +133,11 @@ public class Client {
         frame.repaint();
     }
 
+    public void updatePlayers(Player[] players) {
+        world.get().setPlayers(players);
+        frame.repaint();
+    }
+
     public World getWorld() {
         return world.get();
     }

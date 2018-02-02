@@ -78,23 +78,13 @@ public class STCConnection {
         }
     }
 
-    public void send(World world) {
+    public void send(Object o){
         try {
-            out.writeObject(world);
+            out.writeObject(o);
             out.flush();
             out.reset();
         } catch (IOException e) {
-            System.err.println("unable to send world to clients: " + e);
-        }
-    }
-
-    public void send(Entity[] entities) {
-        try {
-            out.writeObject(entities);
-            out.flush();
-            out.reset();
-        } catch (IOException e) {
-            System.err.println("unable to send entity list to clients: " + e);
+            System.err.println("unable to send object to clients: " + e);
         }
     }
 }

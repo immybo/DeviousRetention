@@ -39,6 +39,7 @@ public class Server {
     public void updateClients() {
         for (STCConnection client : clients) {
             client.send(world.getEntities());
+            client.send(world.getPlayers());
         }
     }
 
