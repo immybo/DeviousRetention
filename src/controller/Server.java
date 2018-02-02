@@ -42,11 +42,6 @@ public class Server {
         }
     }
 
-    public void moveTo(Unit unit, Point.Double worldPosition) {
-        // Just assume that they're allowed to for now
-        unit.setMovePoint(worldPosition);
-    }
-
     public void processAction(Action a) {
         a.run(world);
     }
