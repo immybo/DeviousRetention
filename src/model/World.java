@@ -25,12 +25,16 @@ public class World implements Serializable {
 
     private List<Player> players;
 
+    private Set<Entity>[][] entitiesBySquare;
+
     public World(Board board) {
         this.board = board;
         this.entities = new ArrayList<Entity>();
         this.entitiesToAdd = new ArrayList<Entity>();
         this.entitiesToRemove = new ArrayList<Integer>();
         this.players = new ArrayList<Player>();
+
+        entitiesBySquare = new HashSet[board.getHeight()][board.getWidth()];
     }
 
     public void addPlayer(Player player) {
@@ -77,8 +81,24 @@ public class World implements Serializable {
         }
         entitiesToRemove.clear();
 
+        groupEntitiesBySquare();
+
         for (Entity e : entities) {
             e.tick(this);
+        }
+    }
+
+    private void groupEntitiesBySquare() {
+        for (int x = 0; x < board.getWidth(); x++) {
+            for (int y = 0; y < board.getHeight(); y++) {
+                entitiesBySquare[y][x] = new HashSet<Entity>();
+            }
+        }
+
+        for (Entity e : entities) {
+            for (Point p : containedTiles(e.getSize(), e.getX(), e.getY())) {
+                entitiesBySquare[p.y][p.x].add(e);
+            }
         }
     }
 
@@ -124,77 +144,46 @@ public class World implements Serializable {
         return ret.toArray(new Entity[0]);
     }
 
+    private Point[] containedTiles(double size, double x, double y) {
+        int left = (int)(x-size/2);
+        int top = (int)(y-size/2);
+        int right = (int)(x+size/2);
+        int bottom = (int)(y+size/2);
+
+        java.util.List<Point> contained = new ArrayList<Point>();
+        // <= To include partially contained tiles
+        for (int checkX = left; checkX <= right; checkX++) {
+            for (int checkY = top; checkY <= bottom; checkY++) {
+                contained.add(new Point(checkX, checkY));
+            }
+        }
+        return contained.toArray(new Point[0]);
+    }
+
     /**
      * Returns whether or not something with the given size would be colliding with anything
      * if it was at the given x and y coordinates.
      */
     public boolean isColliding(double size, double x, double y) {
-        boolean isColliding = false;
-
-        int top = (int)(y-size/2);
-        int bottom = (int)(y+size/2);
-        int left = (int)(x-size/2);
-        int right = (int)(x+size/2);
-        // Check the top-left, top-right, bottom-left, bottom-right for collisions
-        Point topLeft = new Point(left, top);
-        Point topRight = new Point(right, top);
-        Point bottomLeft = new Point(left, bottom);
-        Point bottomRight = new Point(right, bottom);
-
-        isColliding |= board.getTile(topLeft).collides();
-        isColliding |= board.getTile(topRight).collides();
-        isColliding |= board.getTile(bottomLeft).collides();
-        isColliding |= board.getTile(bottomRight).collides();
-        if (isColliding) {
-            return true;
-        }
-
-        // This is pretty slow. There's probably a much better way to do it.
-        for (Entity otherEntity : entities) {
-            double xDistance = Math.abs(otherEntity.getX() - x);
-            double yDistance = Math.abs(otherEntity.getY() - y);
-            double avgSize = otherEntity.getSize()/2 + size/2;
-            if (xDistance < avgSize && yDistance < avgSize) {
-                return true;
-            }
-        }
-
-        return false;
+        return isColliding(size, x, y, null);
     }
 
     public boolean isColliding(Entity e, double x, double y) {
-        boolean isColliding = false;
+        return isColliding(e.getSize(), x, y, e);
+    }
 
-        int top = (int)(y-e.getSize()/2);
-        int bottom = (int)(y+e.getSize()/2);
-        int left = (int)(x-e.getSize()/2);
-        int right = (int)(x+e.getSize()/2);
-        // Check the top-left, top-right, bottom-left, bottom-right for collisions
-        Point topLeft = new Point(left, top);
-        Point topRight = new Point(right, top);
-        Point bottomLeft = new Point(left, bottom);
-        Point bottomRight = new Point(right, bottom);
-
-        isColliding |= board.getTile(topLeft).collides();
-        isColliding |= board.getTile(topRight).collides();
-        isColliding |= board.getTile(bottomLeft).collides();
-        isColliding |= board.getTile(bottomRight).collides();
-        if (isColliding) {
-            return true;
-        }
-
-        // This is pretty slow. There's probably a much better way to do it.
-        // TODO use a quadtree / cached values
-        for (Entity otherEntity : entities) {
-            if (otherEntity == e) continue;
-            double xDistance = Math.abs(otherEntity.getX() - x);
-            double yDistance = Math.abs(otherEntity.getY() - y);
-            double size = otherEntity.getSize()/2 + e.getSize()/2;
-            if (xDistance < size && yDistance < size) {
-                return true;
+    private boolean isColliding(double size, double x, double y, Entity excluded) {
+        Rectangle.Double bounds = new Rectangle.Double(x-size/2, y-size/2, size, size);
+        Point[] containedTiles = containedTiles(size, x, y);
+        for (Point toCheck : containedTiles) {
+            Set<Entity> potentialCollisions = entitiesBySquare[toCheck.y][toCheck.x];
+            for (Entity potentialCollision : potentialCollisions) {
+                if (potentialCollision == excluded) continue;
+                else if (potentialCollision.getBounds().intersects(bounds)) {
+                    return true;
+                }
             }
         }
-
         return false;
     }
 

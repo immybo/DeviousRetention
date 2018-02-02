@@ -6,6 +6,7 @@ import util.CoordinateTranslation;
 
 import java.awt.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Something on the layer above tiles, can be interacted with by other entities.
