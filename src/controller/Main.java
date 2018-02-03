@@ -41,10 +41,10 @@ public class Main {
 
         Board board = new Board(tiles);
 
-        UnitTemplate gatherer = new UnitTemplate("Gatherer", new Entity.Ability[]{Entity.Ability.ATTACK, Entity.Ability.GATHER}, 0.2, 1, 10, 10, 0.2, 100, new Cost(150));
-        UnitTemplate archer = new UnitTemplate("Archer", new Entity.Ability[]{Entity.Ability.ATTACK}, 1, 6, 5, 20, 0.15, 100, new Cost(200));
-        UnitTemplate infantry = new UnitTemplate("Infantry", new Entity.Ability[]{Entity.Ability.ATTACK}, 0.3, 1, 10, 75, 0.3, 200, new Cost(200));
-        UnitTemplate cavalry = new UnitTemplate("Cavalry", new Entity.Ability[]{Entity.Ability.ATTACK}, 1.5, 1, 10, 75, 0.5, 350, new Cost(600));
+        UnitTemplate gatherer = new UnitTemplate("Gatherer", new Entity.Ability[]{Entity.Ability.ATTACK, Entity.Ability.GATHER}, 0.2, 1, 10, 10, 0.5, 100, new Cost(150), "gatherer.png");
+        UnitTemplate archer = new UnitTemplate("Archer", new Entity.Ability[]{Entity.Ability.ATTACK}, 1, 6, 5, 20, 0.5, 100, new Cost(200), "archer.png");
+        UnitTemplate infantry = new UnitTemplate("Infantry", new Entity.Ability[]{Entity.Ability.ATTACK}, 0.3, 1, 10, 75, 0.7, 200, new Cost(200), "infantry.png");
+        UnitTemplate cavalry = new UnitTemplate("Cavalry", new Entity.Ability[]{Entity.Ability.ATTACK}, 1.5, 1, 10, 75, 1.2, 350, new Cost(600), "cavalry.png");
 
         BuildingTemplate headquarters = new BuildingTemplate("Headquarters", new Entity.Ability[]{}, 0, 1, 0, 1.5, 5000, new Cost(5000), new UnitTemplate[]{gatherer}, new int[]{10});
         BuildingTemplate barracks = new BuildingTemplate("Barracks", new Entity.Ability[]{}, 0, 1, 0, 1, 2500, new Cost(2000), new UnitTemplate[]{archer, infantry, cavalry}, new int[]{20, 20, 50});

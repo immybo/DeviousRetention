@@ -4,6 +4,7 @@ import controller.Cost;
 import model.Entity;
 import model.World;
 
+import java.awt.*;
 import java.io.Serializable;
 
 /**
@@ -21,8 +22,9 @@ public class UnitTemplate implements EntityTemplate, Serializable {
     private int maxHealth;
     private String name;
     private Cost cost;
+    private String imageName;
 
-    public UnitTemplate(String name, Entity.Ability[] abilities, double movementSpeed, double range, double attackTime, int damage, double size, int maxHealth, Cost cost) {
+    public UnitTemplate(String name, Entity.Ability[] abilities, double movementSpeed, double range, double attackTime, int damage, double size, int maxHealth, Cost cost, String imageName) {
         this.name = name;
         this.abilities = abilities;
         this.movementSpeed = movementSpeed;
@@ -32,11 +34,12 @@ public class UnitTemplate implements EntityTemplate, Serializable {
         this.size = size;
         this.maxHealth = maxHealth;
         this.cost = cost;
+        this.imageName = imageName;
     }
 
     @Override
     public Unit create(World world, int playerNumber, double x, double y) {
-        return new Unit(x, y, size, range, damage, maxHealth, playerNumber, movementSpeed, abilities);
+        return new Unit(x, y, size, range, damage, maxHealth, playerNumber, movementSpeed, abilities, imageName);
     }
 
     @Override

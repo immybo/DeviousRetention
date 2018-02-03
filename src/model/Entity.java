@@ -4,7 +4,10 @@ import controller.Action;
 import model.entity.OwnedEntity;
 import util.CoordinateTranslation;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -27,6 +30,20 @@ public abstract class Entity implements Serializable {
 
     private double size;
 
+    private String imageName;
+    private transient Image image = null;
+
+    public Entity(double x, double y, double size, String imageName) {
+        this.x = x;
+        this.y = y;
+        this.size = size;
+
+        this.id = nextID;
+        nextID++;
+
+        this.imageName = imageName;
+    }
+
     public Entity(double x, double y, double size) {
         this.x = x;
         this.y = y;
@@ -34,6 +51,8 @@ public abstract class Entity implements Serializable {
 
         this.id = nextID;
         nextID++;
+
+        this.imageName = null;
     }
 
     public double getX() {
@@ -116,11 +135,24 @@ public abstract class Entity implements Serializable {
         Point size = new Point((int)(translation.getWorldToScreenMultiplier().x*getSize()),
                 (int)(translation.getWorldToScreenMultiplier().y*getSize()));
         Point bottomRight = new Point(topLeft.x+size.x, topLeft.y+size.y);
-        g.setColor(Color.WHITE);
-        g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
-        g.setColor(Color.BLACK);
-        g.drawRect(topLeft.x, topLeft.y, size.x, size.y);
-        g.drawString(this.getClass().getCanonicalName(), topLeft.x + 10, topLeft.y + 50);
+
+        if (this.imageName == null) {
+            g.setColor(Color.WHITE);
+            g.fillRect(topLeft.x, topLeft.y, size.x, size.y);
+            g.setColor(Color.BLACK);
+            g.drawRect(topLeft.x, topLeft.y, size.x, size.y);
+            g.drawString(this.getClass().getCanonicalName(), topLeft.x + 10, topLeft.y + 50);
+        } else {
+            if (this.image == null) {
+                try {
+                    this.image = ImageIO.read(new File("res/sprite/" + imageName));
+                } catch (IOException e ){
+                    System.err.println("Couldn't load image " + imageName);
+                    this.imageName = null;
+                }
+            }
+            g.drawImage(image, topLeft.x, topLeft.y, size.x, size.y, null);
+        }
 
         if (this instanceof OwnedEntity) {
             OwnedEntity e = ((OwnedEntity)this);
