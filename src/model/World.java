@@ -274,28 +274,21 @@ public class World implements Serializable {
                 double diff = (this.costTo + this.heuristicCost) - (o.costTo + o.heuristicCost);
                 return diff < 0 ? -1 : diff == 0 ? 0 : 1;
             }
-
-            @Override
-            public boolean equals(Object other) {
-                if (other instanceof AStarNode) {
-                    if (((AStarNode)other).point.equals(this.point)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
         }
 
         // We do this on the granularity of tiles for simplicity and speed
 
         // A*
-        List<AStarNode> visited = new ArrayList<AStarNode>();
+        Set<Point.Double> visited = new HashSet<Point.Double>();
         java.util.Queue<AStarNode> fringe = new PriorityQueue<AStarNode>();
 
         fringe.add(new AStarNode(startPointMiddle, null, 0));
-
         while (!fringe.isEmpty()) {
             AStarNode current = fringe.poll();
+            if (visited.contains(current.point)) {
+                continue;
+            }
+
             if (current.point.distance(endPointReal) < range) {
                 List<Point.Double> points = new ArrayList<Point.Double>();
                 while (current.from != null) {
@@ -306,7 +299,7 @@ public class World implements Serializable {
                 return points.toArray(new Point.Double[0]);
             }
 
-            visited.add(current);
+            visited.add(current.point);
 
             Point.Double[] neighbourPoints = new Point.Double[] {
                     new Point.Double(current.point.x + PATHFINDING_GRANULARITY, current.point.y),
@@ -322,33 +315,14 @@ public class World implements Serializable {
             for (Point.Double neighbourPoint : neighbourPoints) {
                 if (neighbourPoint.x - entity.getSize()/2 < 0 || neighbourPoint.y - entity.getSize()/2 < 0 || neighbourPoint.x + entity.getSize()/2 >= board.getWidth() || neighbourPoint.y + entity.getSize()/2 >= board.getHeight()) {
                     continue;
-                }
-
-                if (isColliding(entity, neighbourPoint.x, neighbourPoint.y)) {
+                } else if (isColliding(entity, neighbourPoint.x, neighbourPoint.y)) {
+                    continue;
+                } else if (visited.contains(neighbourPoint)) {
                     continue;
                 }
 
                 AStarNode neighbour = new AStarNode(neighbourPoint, current, current.costTo + current.point.distance(neighbourPoint));
-
-                if (visited.contains(neighbour)) {
-                    continue;
-                }
-
-                // Two nodes are equal if  they share the same point, so...
-                if (fringe.contains(neighbour)) {
-                    for (AStarNode otherNeighbour : fringe) {
-                        if (otherNeighbour.equals(neighbour)) {
-                            // Only replace it if our path is shorter
-                            if (neighbour.costTo < otherNeighbour.costTo) {
-                                fringe.remove(otherNeighbour);
-                                fringe.add(neighbour);
-                            }
-                            break;
-                        }
-                    }
-                } else {
-                    fringe.add(neighbour);
-                }
+                fringe.add(neighbour);
             }
         }
 
