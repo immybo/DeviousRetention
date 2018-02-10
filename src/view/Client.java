@@ -109,37 +109,41 @@ public class Client {
         this.server = server;
     }
 
-    public void setWorld(World world) {
+    public synchronized void setWorld(World world) {
         this.world.set(world);
         if (buildingsPanel.getComponents().length == 0) {
             buildingsPanel.removeAll();
-            for (BuildingTemplate bt : getWorld().getPlayer(playerNumber).getBuildable()) {
-                JButton buildButton = new JButton(bt.getName());
-                buildButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        gamePanel.setPlacingBuilding(bt);
-                    }
-                });
-                buildingsPanel.add(buildButton);
+            // Sometimes we don't have a player object yet, because the server has only just sent the world
+            Player player = getWorld().getPlayer(playerNumber);
+            if (player != null) {
+                for (BuildingTemplate bt : player.getBuildable()) {
+                    JButton buildButton = new JButton(bt.getName());
+                    buildButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            gamePanel.setPlacingBuilding(bt);
+                        }
+                    });
+                    buildingsPanel.add(buildButton);
+                }
             }
             frame.validate();
         }
         frame.repaint();
     }
 
+    public synchronized World getWorld() {
+        return world.get();
+    }
+
     public void updateEntities(Entity[] entities) {
-        world.get().setEntities(entities);
+        getWorld().setEntities(entities);
         frame.repaint();
     }
 
     public void updatePlayers(Player[] players) {
-        world.get().setPlayers(players);
+        getWorld().setPlayers(players);
         frame.repaint();
-    }
-
-    public World getWorld() {
-        return world.get();
     }
 
     public Integer[] getSelected() {
@@ -147,7 +151,7 @@ public class Client {
         java.util.List<Integer> toRemove = new ArrayList<Integer>();
         for (Integer i : toRemove) {
             try {
-                world.get().getEntityByID(i);
+                getWorld().getEntityByID(i);
             } catch (IllegalArgumentException e) {
                 toRemove.add(i);
             }
