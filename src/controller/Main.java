@@ -71,19 +71,14 @@ public class Main {
         world.addEntity(smallResource.create(world, -1, 10, 20));
 
         Server server = new Server(world);
-        launchClient(server, new BuildingTemplate[]{headquarters, barracks});
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        launchClient(server, new BuildingTemplate[]{headquarters, barracks});
 
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        launchClient(server, new BuildingTemplate[]{headquarters, barracks});
+        launchClient(server, new BuildingTemplate[]{headquarters, barracks});
 
         server.updateClients();
         world.tick();
@@ -109,9 +104,6 @@ public class Main {
     private static void launchClient(Server server, BuildingTemplate[] buildable) {
         Player player = new Player(currentPlayerNumber++, buildable);
         player.earnCredits(10000);
-        STCConnection stc = new STCConnection(server);
-        server.addPlayer(player);
-        server.addClient(stc);
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -119,7 +111,6 @@ public class Main {
                 Client client = new Client(World.NULL_WORLD, player.getPlayerNumber());
                 CTSConnection cts = new CTSConnection(client);
                 client.setServer(cts);
-                stc.send(server.getWorld());
             }
         });
     }

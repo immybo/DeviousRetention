@@ -22,40 +22,25 @@ public class STCConnection {
 
     private final Server server;
     private Socket client;
-    private Thread listenThread;
     private ObjectOutputStream out;
 
-    public STCConnection(Server server) {
+    public STCConnection(Server server, Socket client) {
         this.server = server;
-        this.client = null;
-        this.listenThread = null;
+        this.client = client;
+
+        try {
+            this.out = new ObjectOutputStream(client.getOutputStream());
+        } catch (IOException e) {
+            System.err.println("couldn't open STC output stream " + e);
+            System.exit(1);
+        }
 
         Runnable listenRun = new Runnable() {
             public void run() {
-                listen();
+                listenToClient(client);
             }
         };
-        this.listenThread = new Thread(listenRun);
-        listenThread.start();
-    }
-
-    private void listen() {
-        try {
-            ServerSocket listener = new ServerSocket(LISTEN_PORT);
-            this.client = listener.accept();
-            this.out = new ObjectOutputStream(client.getOutputStream());
-            listener.close();
-
-            Runnable listenRun = new Runnable() {
-                public void run() {
-                    listenToClient(client);
-                }
-            };
-            new Thread(listenRun).start();
-        } catch (IOException e) {
-            System.err.println("couldn't accept client connection: " + e);
-            System.exit(1);
-        }
+        new Thread(listenRun).start();
     }
 
     private void listenToClient(Socket client) {
@@ -78,7 +63,7 @@ public class STCConnection {
         }
     }
 
-    public void send(Object o){
+    public synchronized void send(Object o){
         try {
             out.writeObject(o);
             out.flush();
