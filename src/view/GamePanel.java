@@ -214,13 +214,28 @@ public class GamePanel extends JPanel {
                 }
             } else if (e.getButton() == MouseEvent.BUTTON3) {
                 Entity[] entsAt = client.getWorld().getEntitiesAt(pt);
+
+                java.util.List<Entity> selected = new ArrayList<Entity>();
                 for (Integer id : client.getSelected()) {
-                    Entity selected = client.getWorld().getEntityByID(id);
+                    selected.add(client.getWorld().getEntityByID(id));
+                }
+
+                // If we're moving, we want to try and maintain the same formation, so we need to find the center
+                double totalX = 0;
+                double totalY = 0;
+                for (Entity selectedEnt : selected) {
+                    totalX += selectedEnt.getX();
+                    totalY += selectedEnt.getY();
+                }
+                double centerX = totalX / selected.size();
+                double centerY = totalY / selected.size();
+
+                for (Entity selectedEnt : selected) {
                     boolean foundAction = false;
-                    if (selected instanceof Unit) {
+                    if (selectedEnt instanceof Unit) {
                         for (Entity ent : entsAt) {
                             if (((Unit)selected).canAttack(ent)) {
-                                client.sendAction(new AttackAction(id, ent.id));
+                                client.sendAction(new AttackAction(selectedEnt.id, ent.id));
                                 foundAction = true;
                                 break;
                             }
@@ -229,7 +244,7 @@ public class GamePanel extends JPanel {
                         if (!foundAction) {
                             for (Entity ent : entsAt) {
                                 if (ent instanceof Resource) {
-                                    client.sendAction(new GatherAction(id, ent.id));
+                                    client.sendAction(new GatherAction(selectedEnt.id, ent.id));
                                     foundAction = true;
                                     break;
                                 }
@@ -238,7 +253,9 @@ public class GamePanel extends JPanel {
                     }
 
                     if (!foundAction) {
-                        client.sendAction(new MoveAction(id, pt));
+                        double xCenterDist = selectedEnt.getX() - centerX;
+                        double yCenterDist = selectedEnt.getY() - centerY;
+                        client.sendAction(new MoveAction(selectedEnt.id, new Point.Double(pt.x + xCenterDist, pt.y + yCenterDist)));
                     }
                 }
             }
