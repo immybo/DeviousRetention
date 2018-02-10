@@ -6,7 +6,9 @@ import model.World;
 import util.CoordinateTranslation;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.lang.reflect.Constructor;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An entity which is owned by a player, which can be moved around and can perform actions
@@ -14,7 +16,8 @@ import java.lang.reflect.Constructor;
  */
 public class Unit extends OwnedEntity {
     private Point.Double movePoint = null;
-    private Point.Double[] movePointSteps = null;
+    private AtomicReference<Point.Double[]> movePointSteps;
+    private boolean mustRecalculateSteps = false;
     private int currentMovePointStep = 0;
     private OwnedEntity target = null;
     private Resource gatherTarget = null;
@@ -31,6 +34,7 @@ public class Unit extends OwnedEntity {
         this.range = range;
         this.damage = damage;
         this.abilities = abilities;
+        this.movePointSteps = new AtomicReference<Point.Double[]>(null);
     }
 
     public boolean can(Entity.Ability doThis) {
@@ -54,7 +58,7 @@ public class Unit extends OwnedEntity {
     }
 
     private void setMovePointNoCancel(Point.Double newPoint) {
-        this.movePointSteps = null;
+        this.mustRecalculateSteps = true;
         this.movePoint = newPoint;
     }
 
@@ -77,7 +81,7 @@ public class Unit extends OwnedEntity {
         this.target = null;
         this.gatherTarget = null;
         this.movePoint = null;
-        this.movePointSteps = null;
+        this.mustRecalculateSteps = true;
     }
 
     @Override
@@ -130,22 +134,32 @@ public class Unit extends OwnedEntity {
 
     private void moveTick(World world) {
         // If we haven't done any path finding yet, do it now.
-        if (this.movePointSteps == null) {
-            this.movePointSteps = world.getPath(new Point.Double(this.getX(), this.getY()), movePoint, this, -1);
-            if (this.movePointSteps == null) {
-                // We have no path so just try and go straight there
-                this.movePointSteps = new Point.Double[]{ new Point.Double(movePoint.getX(), movePoint.getY()) };
-            }
-            this.currentMovePointStep = 0;
-        }
-
-        if (this.currentMovePointStep >= this.movePointSteps.length) {
-            this.movePoint = null;
-            this.movePointSteps = null;
+        if (this.mustRecalculateSteps) {
+            mustRecalculateSteps = false;
+            Unit u = this;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Point.Double[] path = world.getPath(new Point.Double(getX(), getY()), movePoint, u, -1);
+                    if (path == null) {
+                        // We have no path so just try and go straight there
+                        movePointSteps.set(new Point.Double[]{ new Point.Double(movePoint.getX(), movePoint.getY()) });
+                    } else {
+                        movePointSteps.set(path);
+                    }
+                    currentMovePointStep = 0;
+                }
+            }).run();
             return;
         }
 
-        Point.Double movePoint = this.movePointSteps[this.currentMovePointStep];
+        if (this.currentMovePointStep >= this.movePointSteps.get().length) {
+            this.movePoint = null;
+            this.mustRecalculateSteps = true;
+            return;
+        }
+
+        Point.Double movePoint = this.movePointSteps.get()[this.currentMovePointStep];
 
         double moveX = movePoint.x - this.getX();
         double moveY = movePoint.y - this.getY();
@@ -162,7 +176,7 @@ public class Unit extends OwnedEntity {
 
         boolean collided = this.moveBy(world, deltaX, deltaY);
         if (collided) {
-            this.movePointSteps = null; // Recalculate the path next time
+            this.mustRecalculateSteps = true; // Recalculate the path next time
         }
     }
 
