@@ -89,7 +89,13 @@ public class GamePanel extends JPanel {
         Stroke oldStroke = g2d.getStroke();
         for (Integer i : client.getSelected()) {
             g2d.setStroke(new BasicStroke(5));
-            Entity e = client.getWorld().getEntityByID(i);
+            Entity e = null;
+            try {
+                e = client.getWorld().getEntityByID(i);
+            } catch (IllegalArgumentException ex) {
+                continue; // Clearly this entity doesn't exist
+            }
+
             if (e instanceof OwnedEntity) {
                 OwnedEntity ownedE = (OwnedEntity)e;
                 g2d.setColor(Player.getPlayerColor(ownedE.getPlayerNumber()));
