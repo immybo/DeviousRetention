@@ -23,10 +23,10 @@ public class CTSConnection {
     private Thread listenThread;
     private ObjectOutputStream out;
 
-    public CTSConnection(Client client) {
+    public CTSConnection(Client client, Player player) {
         this.client = client;
         this.server = null;
-        connect();
+        connect(player);
 
         Runnable listenRun = new Runnable() {
             public void run() {
@@ -37,10 +37,11 @@ public class CTSConnection {
         listenThread.start();
     }
 
-    public void connect() {
+    public void connect(Player player) {
         try {
             this.server = new Socket(InetAddress.getByName("localhost"), STCConnection.LISTEN_PORT);
             out = new ObjectOutputStream(server.getOutputStream());
+            send(player);
         } catch (IOException e) {
             System.err.println("couldn't accept server connection: " + e);
             System.exit(1);
@@ -88,13 +89,13 @@ public class CTSConnection {
         }
     }
 
-    public void send(Action action) {
+    public void send(Object o) {
         try {
-            out.writeObject(action);
+            out.writeObject(o);
             out.flush();
             out.reset();
         } catch (IOException e) {
-            System.err.println("unable to send action to server: " + e);
+            System.err.println("unable to send object to server: " + e);
         }
     }
 }

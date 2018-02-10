@@ -109,7 +109,7 @@ public class Main {
             @Override
             public void run() {
                 Client client = new Client(World.NULL_WORLD, player.getPlayerNumber());
-                CTSConnection cts = new CTSConnection(client);
+                CTSConnection cts = new CTSConnection(client, player);
                 client.setServer(cts);
             }
         });

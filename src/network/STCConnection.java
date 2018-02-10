@@ -3,6 +3,7 @@ package network;
 import controller.Action;
 import controller.Server;
 import model.Entity;
+import model.Player;
 import model.World;
 
 import java.io.IOException;
@@ -54,8 +55,12 @@ public class STCConnection {
 
         while (!client.isClosed()) {
             try {
-                Action in = (Action)input.readObject();
-                server.processAction(in);
+                Object in = input.readObject();
+                if (in instanceof Action) {
+                    server.processAction((Action)in);
+                } else if (in instanceof Player) {
+                    server.addPlayer((Player)in);
+                }
             } catch (IOException|ClassNotFoundException e) {
                 System.err.println("couldn't read object from client: " + e);
                 // No need to terminate here, we can keep going
