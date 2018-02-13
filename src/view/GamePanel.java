@@ -234,7 +234,7 @@ public class GamePanel extends JPanel {
                     boolean foundAction = false;
                     if (selectedEnt instanceof Unit) {
                         for (Entity ent : entsAt) {
-                            if (((Unit)selected).canAttack(ent)) {
+                            if (((Unit)selectedEnt).canAttack(ent)) {
                                 client.sendAction(new AttackAction(selectedEnt.id, ent.id));
                                 foundAction = true;
                                 break;
