@@ -80,7 +80,6 @@ public class Unit extends OwnedEntity {
     public void clearAllTargets() {
         this.target = null;
         this.gatherTarget = null;
-        this.movePoint = null;
         this.mustRecalculateSteps = true;
     }
 
@@ -100,7 +99,7 @@ public class Unit extends OwnedEntity {
 
     private void attackTick(World world) {
         double distance = this.distanceTo(target);
-        if (distance > range) {
+        if (distance > range + target.getSize()/2 + getSize()/2) {
             if (this.movePoint == null) {
                 // Move to be within range
                 setMovePointNoCancel(new Point.Double(target.getX(), target.getY()));
@@ -140,21 +139,31 @@ public class Unit extends OwnedEntity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Point.Double[] path = world.getPath(new Point.Double(getX(), getY()), movePoint, u, -1);
-                    if (path == null) {
-                        // We have no path so just try and go straight there
-                        movePointSteps.set(new Point.Double[]{ new Point.Double(movePoint.getX(), movePoint.getY()) });
-                    } else {
-                        movePointSteps.set(path);
+                    try {
+                        Point.Double endPoint = world.getNearestEmptyPoint(getSize(), movePoint.x, movePoint.y, 10);
+                        if (endPoint == null) {
+                            movePointSteps.set(new Point.Double[]{movePoint});
+                            return;
+                        }
+                        Point.Double[] path = world.getPath(new Point.Double(getX(), getY()), endPoint, u, getSize() / 2);
+                        if (path == null) {
+                            // We have no path so just try and go straight there
+                            movePointSteps.set(new Point.Double[]{endPoint});
+                        } else {
+                            movePointSteps.set(path);
+                        }
+                        currentMovePointStep = 0;
+                    } catch (NullPointerException e) {
+                        System.out.println();
                     }
-                    currentMovePointStep = 0;
                 }
-            }).run();
+            }).start();
+            return;
+        } else if (this.movePointSteps.get() == null) {
             return;
         }
 
         if (this.currentMovePointStep >= this.movePointSteps.get().length) {
-            this.movePoint = null;
             this.mustRecalculateSteps = true;
             return;
         }
