@@ -51,4 +51,8 @@ public class UnitTemplate implements EntityTemplate, Serializable {
     public Cost getCost() {
         return cost;
     }
+
+    public double getSize() {
+        return size;
+    }
 }
