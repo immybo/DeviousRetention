@@ -6,6 +6,7 @@ import model.Entity;
 import model.Player;
 import model.World;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -57,9 +58,16 @@ public class STCConnection {
             try {
                 Object in = input.readObject();
                 if (in instanceof Action) {
-                    server.processAction((Action)in);
+                    server.queueAction((Action)in);
                 } else if (in instanceof Player) {
                     server.addPlayer((Player)in);
+                } else if (in instanceof Integer) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            server.checkHash((Integer)in);
+                        }
+                    }).start();
                 }
             } catch (IOException|ClassNotFoundException e) {
                 System.err.println("couldn't read object from client: " + e);

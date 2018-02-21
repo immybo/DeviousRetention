@@ -30,6 +30,8 @@ public class Client {
     private AtomicReference<World> world;
     private CTSConnection server = null;
 
+    private long currentTick;
+
     private java.util.List<Integer> selectedIds;
 
     private final int playerNumber;
@@ -38,6 +40,7 @@ public class Client {
         this.world = new AtomicReference<World>(world);
         this.selectedIds = new ArrayList<Integer>();
         this.playerNumber = playerNumber;
+        this.currentTick = 0;
 
         frame = new JFrame();
 
@@ -93,6 +96,23 @@ public class Client {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+    }
+
+    public void handleServerTick(TickObject tickObj) {
+        // First check to see if we're synchronized. If we're not, send garbage back to the server
+        // to synchronize everybody.
+        if (currentTick != tickObj.tickNumber) {
+            server.send(-1);
+            return;
+        }
+
+        tickObj.apply(getWorld());
+        getWorld().tick();
+
+        currentTick++;
+
+        // Send the actual hash back to the server once we've applied the tick successfully
+        server.send(world.hashCode());
     }
 
     public void sendAction(Action a) {

@@ -1,6 +1,7 @@
 package network;
 
 import controller.Action;
+import controller.TickObject;
 import model.Entity;
 import model.Player;
 import view.Client;
@@ -79,6 +80,13 @@ public class CTSConnection {
                         @Override
                         public void run() {
                             client.updatePlayers((Player[])in);
+                        }
+                    });
+                } else if (in instanceof TickObject) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            client.handleServerTick((TickObject)in);
                         }
                     });
                 }

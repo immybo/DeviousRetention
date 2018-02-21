@@ -1,5 +1,7 @@
 package model;
 
+import controller.Action;
+import controller.TickObject;
 import model.tile.GrassTile;
 import util.CoordinateTranslation;
 
@@ -327,5 +329,10 @@ public class World implements Serializable {
         }
 
         return null;
+    }
+
+    @Override
+    public int hashCode() {
+        return 0; // TODO
     }
 }

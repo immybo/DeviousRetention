@@ -87,16 +87,7 @@ public class Main {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                long startTime = System.currentTimeMillis();
-                world.tick();
-                long tickEnd = System.currentTimeMillis();
-                server.updateClients();
-                long updateTime = System.currentTimeMillis()-tickEnd;
-                long tickTime = tickEnd-startTime;
-
-                if (updateTime + tickTime > TICK_TIME_MS) {
-                    System.out.println("LONG TICK. Update: " + updateTime + "ms; tick: " + tickTime + "ms.");
-                }
+                server.tick();
             }
         }, 0, TICK_TIME_MS);
     }

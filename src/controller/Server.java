@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,12 +27,15 @@ public class Server {
     private List<STCConnection> clients;
     private World world;
 
-    private int i = 0;
+    private long tickNumber;
+
+    private List<Action> actionQueue;
 
     public Server(World world) {
         clients = new CopyOnWriteArrayList<STCConnection>();
+        tickNumber = 0;
         this.world = world;
-
+        this.actionQueue = Collections.synchronizedList(new ArrayList<Action>());
         this.listenThread = null;
 
         Runnable listenRun = new Runnable() {
@@ -48,6 +52,18 @@ public class Server {
         listenThread.start();
     }
 
+    public void queueAction(Action a) {
+        actionQueue.add(a);
+    }
+
+    private Action[] pollActions() {
+        synchronized(actionQueue) {
+            Action[] actions = actionQueue.toArray(new Action[0]);
+            actionQueue.clear();
+            return actions;
+        }
+    }
+
     private void listenForClients() throws IOException {
         ServerSocket listener = new ServerSocket(LISTEN_PORT);
         while(true) {
@@ -60,6 +76,30 @@ public class Server {
                 System.err.println("couldn't accept client connection: " + e);
                 System.exit(1);
             }
+        }
+    }
+
+    public void tick() {
+        Action[] toApply = pollActions();
+        TickObject tickObj = new TickObject(tickNumber, toApply);
+        tickNumber++;
+
+        for (STCConnection client : clients) {
+            client.send(tickObj);
+        }
+
+        tickObj.apply(world);
+        world.tick();
+    }
+
+    /**
+     * Makes sure that the given hash corresponds to our world. If it doesn't, reset
+     * all of the clients to our current world.
+     */
+    public void checkHash(int hash) {
+        System.out.println(hash);
+        if (hash != getWorld().hashCode()) {
+            updateClients();
         }
     }
 
@@ -82,9 +122,5 @@ public class Server {
                 client.send(world.getPlayers());
             }
         }
-    }
-
-    public void processAction(Action a) {
-        a.run(world);
     }
 }
