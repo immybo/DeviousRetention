@@ -33,7 +33,9 @@ public abstract class Entity implements Serializable {
     private String imageName;
     private transient Image image = null;
 
-    public Entity(double x, double y, double size, String imageName) {
+    private final String name;
+
+    public Entity(double x, double y, double size, String imageName, String name) {
         this.x = x;
         this.y = y;
         this.size = size;
@@ -42,9 +44,10 @@ public abstract class Entity implements Serializable {
         nextID++;
 
         this.imageName = imageName;
+        this.name = name;
     }
 
-    public Entity(double x, double y, double size) {
+    public Entity(double x, double y, double size, String name) {
         this.x = x;
         this.y = y;
         this.size = size;
@@ -53,6 +56,15 @@ public abstract class Entity implements Serializable {
         nextID++;
 
         this.imageName = null;
+        this.name = name;
+    }
+
+    public static void setNextID(int id) {
+        nextID = id;
+    }
+
+    public static int getNextID() {
+        return nextID;
     }
 
     public double getX() {
@@ -203,5 +215,23 @@ public abstract class Entity implements Serializable {
      */
     public Action[] getActions() {
         return new Action[0];
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Entity && o.hashCode() == hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode *= getX();
+        hashCode *= getY();
+        hashCode *= getName().hashCode();
+        return hashCode;
     }
 }

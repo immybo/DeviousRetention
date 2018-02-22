@@ -7,8 +7,8 @@ public class Resource extends Entity {
     private int currentAmount;
     private final double efficiency;
 
-    public Resource(double x, double y, double size, int totalAmount, double efficiency) {
-        super(x, y, size);
+    public Resource(double x, double y, double size, int totalAmount, double efficiency, String name) {
+        super(x, y, size, name);
 
         this.totalAmount = totalAmount;
         this.currentAmount = this.totalAmount;

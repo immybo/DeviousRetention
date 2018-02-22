@@ -78,7 +78,7 @@ public class World implements Serializable {
         }
     }
 
-    public void setEntities(Entity[] entities) {
+    public synchronized void setEntities(Entity[] entities) {
         this.entities = Arrays.asList(entities);
     }
 
@@ -332,7 +332,25 @@ public class World implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        return o instanceof World && o.hashCode() == hashCode();
+    }
+
+    @Override
     public int hashCode() {
-        return 0; // TODO
+        // Although it's not strictly the purpose of a hash code, we don't actually
+        // need to compare everything here - only things that could be out of sync
+        // between clients. Since the board can't change within a game, we don't
+        // need to check that, for example.
+
+        int hashCode = 0;
+
+        for (Entity e : getEntities()) {
+            hashCode += e.hashCode();
+        }
+        // Apparently multiplying is good for uniqueness, so
+        hashCode *= Math.pow(getEntities().length, 2);
+
+        return hashCode;
     }
 }

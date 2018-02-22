@@ -12,15 +12,15 @@ public abstract class OwnedEntity extends Entity {
     private int maxHealth;
     private int health;
 
-    public OwnedEntity(double x, double y, double size, int playerNumber, int maxHealth, String imageName) {
-        super(x, y, size, imageName);
+    public OwnedEntity(double x, double y, double size, int playerNumber, int maxHealth, String imageName, String name) {
+        super(x, y, size, imageName, name);
         this.playerNumber = playerNumber;
         this.maxHealth = maxHealth;
         this.health = maxHealth;
     }
 
-    public OwnedEntity(double x, double y, double size, int playerNumber, int maxHealth) {
-        super(x, y, size);
+    public OwnedEntity(double x, double y, double size, int playerNumber, int maxHealth, String name) {
+        super(x, y, size, name);
         this.playerNumber = playerNumber;
         this.maxHealth = maxHealth;
         this.health = maxHealth;
@@ -57,5 +57,10 @@ public abstract class OwnedEntity extends Entity {
         if (getHealth() < 0) {
             world.removeEntity(this);
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return playerNumber*7 + getHealth()*13 + super.hashCode();
     }
 }

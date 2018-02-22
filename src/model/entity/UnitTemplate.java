@@ -39,7 +39,7 @@ public class UnitTemplate implements EntityTemplate, Serializable {
 
     @Override
     public Unit create(World world, int playerNumber, double x, double y) {
-        return new Unit(x, y, size, range, damage, maxHealth, playerNumber, movementSpeed, abilities, imageName);
+        return new Unit(x, y, size, range, damage, maxHealth, playerNumber, movementSpeed, abilities, imageName, name);
     }
 
     @Override

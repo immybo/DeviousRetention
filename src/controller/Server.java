@@ -1,5 +1,6 @@
 package controller;
 
+import model.Entity;
 import model.Player;
 import model.World;
 import model.entity.Unit;
@@ -81,7 +82,7 @@ public class Server {
 
     public void tick() {
         Action[] toApply = pollActions();
-        TickObject tickObj = new TickObject(tickNumber, toApply);
+        TickObject tickObj = new TickObject(tickNumber, toApply, getWorld().hashCode(), false, Entity.getNextID());
         tickNumber++;
 
         for (STCConnection client : clients) {
@@ -97,14 +98,23 @@ public class Server {
      * all of the clients to our current world.
      */
     public void checkHash(int hash) {
-        System.out.println(hash);
-        if (hash != getWorld().hashCode()) {
+        if (hash == -1) {
+            System.out.println("Resetting clients to tick #" + tickNumber);
             updateClients();
+            resetClientsToTick(tickNumber);
+        }
+
+        int serverHash = getWorld().hashCode();
+        if (hash != serverHash) {
+            System.out.println("Out of sync; client hash of " + hash + " != server hash of " + serverHash);
+            updateClients();
+            resetClientsToTick(tickNumber);
         }
     }
 
     public void addClient(STCConnection connection) {
         clients.add(connection);
+        connection.send(getWorld());
     }
 
     public World getWorld() {
@@ -121,6 +131,12 @@ public class Server {
                 client.send(world.getEntities());
                 client.send(world.getPlayers());
             }
+        }
+    }
+
+    public void resetClientsToTick(long tickNumber) {
+        for (STCConnection client : clients) {
+            client.send(new TickObject(tickNumber, new Action[0], getWorld().hashCode(), true, Entity.getNextID()));
         }
     }
 }

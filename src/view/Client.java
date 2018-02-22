@@ -40,7 +40,7 @@ public class Client {
         this.world = new AtomicReference<World>(world);
         this.selectedIds = new ArrayList<Integer>();
         this.playerNumber = playerNumber;
-        this.currentTick = 0;
+        this.currentTick = -1;
 
         frame = new JFrame();
 
@@ -99,20 +99,28 @@ public class Client {
     }
 
     public void handleServerTick(TickObject tickObj) {
-        // First check to see if we're synchronized. If we're not, send garbage back to the server
+        if (currentTick == -1 || tickObj.shouldReset()) {
+            currentTick = tickObj.tickNumber;
+        }
+
+        // First check to see if we're synchronized. If we're not, send -1 back to the server
         // to synchronize everybody.
-        if (currentTick != tickObj.tickNumber) {
+        if (currentTick != tickObj.tickNumber || tickObj.getPreviousWorldHash() != getWorld().hashCode()) {
+            System.out.println("Client not synchronized.");
+            System.out.println("Current tick on client is " + currentTick + "; received tick is " + tickObj.tickNumber);
+            System.out.println("Current hash on client is " + getWorld().hashCode() + "; received hash is " + tickObj.getPreviousWorldHash());
             server.send(-1);
             return;
         }
+
+        Entity.setNextID(tickObj.nextID);
 
         tickObj.apply(getWorld());
         getWorld().tick();
 
         currentTick++;
 
-        // Send the actual hash back to the server once we've applied the tick successfully
-        server.send(world.hashCode());
+        frame.repaint();
     }
 
     public void sendAction(Action a) {
@@ -239,6 +247,7 @@ public class Client {
         public void mouseWheelMoved(MouseWheelEvent e) {
             int rotAmount = e.getWheelRotation();
             gamePanel.zoomBy(Math.pow(ZOOM_CHANGE_MULTIPLIER, -rotAmount));
+            frame.repaint();
         }
     }
 

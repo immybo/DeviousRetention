@@ -13,6 +13,7 @@ public class ResourceTemplate implements EntityTemplate, Serializable {
     private String name;
 
     public ResourceTemplate(String name, double size, int totalAmount, double efficiency) {
+        this.name = name;
         this.size = size;
         this.totalAmount = totalAmount;
         this.efficiency = efficiency;
@@ -20,7 +21,7 @@ public class ResourceTemplate implements EntityTemplate, Serializable {
 
     @Override
     public Resource create(World world, int playerNumber, double x, double y) {
-        return new Resource(x, y, size, totalAmount, efficiency);
+        return new Resource(x, y, size, totalAmount, efficiency, name);
     }
 
     @Override
