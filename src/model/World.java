@@ -29,14 +29,31 @@ public class World implements Serializable {
 
     private Set<Entity>[][] entitiesBySquare;
 
+    // It would be better to store this as a static variable in Entity, but this obviously
+    // causes issues when running a client and a server in the same process
+    private int nextEntityID;
+
     public World(Board board) {
         this.board = board;
         this.entities = new ArrayList<Entity>();
         this.entitiesToAdd = new ArrayList<Entity>();
         this.entitiesToRemove = new ArrayList<Integer>();
         this.players = new ArrayList<Player>();
+        this.nextEntityID = 0;
 
         entitiesBySquare = new HashSet[board.getHeight()][board.getWidth()];
+    }
+
+    public synchronized int getNextEntityIDAndIncrement() {
+        return nextEntityID++;
+    }
+
+    public synchronized int getNextEntityID() {
+        return nextEntityID;
+    }
+
+    public synchronized void setNextEntityID(int nextEntityID) {
+        this.nextEntityID = nextEntityID;
     }
 
     public void addPlayer(Player player) {

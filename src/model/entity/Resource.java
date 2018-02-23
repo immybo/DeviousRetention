@@ -1,14 +1,15 @@
 package model.entity;
 
 import model.Entity;
+import model.World;
 
 public class Resource extends Entity {
     private final int totalAmount;
     private int currentAmount;
     private final double efficiency;
 
-    public Resource(double x, double y, double size, int totalAmount, double efficiency, String name) {
-        super(x, y, size, name);
+    public Resource(World world, double x, double y, double size, int totalAmount, double efficiency, String name) {
+        super(world, x, y, size, name);
 
         this.totalAmount = totalAmount;
         this.currentAmount = this.totalAmount;

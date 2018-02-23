@@ -12,15 +12,15 @@ public abstract class OwnedEntity extends Entity {
     private int maxHealth;
     private int health;
 
-    public OwnedEntity(double x, double y, double size, int playerNumber, int maxHealth, String imageName, String name) {
-        super(x, y, size, imageName, name);
+    public OwnedEntity(World world, double x, double y, double size, int playerNumber, int maxHealth, String imageName, String name) {
+        super(world, x, y, size, imageName, name);
         this.playerNumber = playerNumber;
         this.maxHealth = maxHealth;
         this.health = maxHealth;
     }
 
-    public OwnedEntity(double x, double y, double size, int playerNumber, int maxHealth, String name) {
-        super(x, y, size, name);
+    public OwnedEntity(World world, double x, double y, double size, int playerNumber, int maxHealth, String name) {
+        super(world, x, y, size, name);
         this.playerNumber = playerNumber;
         this.maxHealth = maxHealth;
         this.health = maxHealth;

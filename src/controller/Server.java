@@ -82,7 +82,7 @@ public class Server {
 
     public void tick() {
         Action[] toApply = pollActions();
-        TickObject tickObj = new TickObject(tickNumber, toApply, getWorld().hashCode(), false, Entity.getNextID());
+        TickObject tickObj = new TickObject(tickNumber, toApply, getWorld().hashCode(), false, getWorld().getNextEntityID());
         tickNumber++;
 
         for (STCConnection client : clients) {
@@ -136,7 +136,7 @@ public class Server {
 
     public void resetClientsToTick(long tickNumber) {
         for (STCConnection client : clients) {
-            client.send(new TickObject(tickNumber, new Action[0], getWorld().hashCode(), true, Entity.getNextID()));
+            client.send(new TickObject(tickNumber, new Action[0], getWorld().hashCode(), true, getWorld().getNextEntityID()));
         }
     }
 }

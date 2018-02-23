@@ -19,8 +19,8 @@ public class Building extends OwnedEntity {
     private int currentTrainTick;
     private Queue<UnitTemplate> trainQueue;
 
-    public Building(double x, double y, double size, int playerNumber, int maxHealth, UnitTemplate[] trainableUnits, int[] trainTicks, String name) {
-        super(x, y, size, playerNumber, maxHealth, name);
+    public Building(World world, double x, double y, double size, int playerNumber, int maxHealth, UnitTemplate[] trainableUnits, int[] trainTicks, String name) {
+        super(world, x, y, size, playerNumber, maxHealth, name);
 
         this.trainableUnits = trainableUnits;
         this.trainTicks = trainTicks;

@@ -21,7 +21,7 @@ public class ResourceTemplate implements EntityTemplate, Serializable {
 
     @Override
     public Resource create(World world, int playerNumber, double x, double y) {
-        return new Resource(x, y, size, totalAmount, efficiency, name);
+        return new Resource(world, x, y, size, totalAmount, efficiency, name);
     }
 
     @Override

@@ -28,8 +28,8 @@ public class Unit extends OwnedEntity {
     private int damage;
     private Entity.Ability[] abilities;
 
-    public Unit(double x, double y, double size, double range, int damage, int maxHealth, int playerNumber, double movementSpeed, Entity.Ability[] abilities, String imageName, String name) {
-        super(x, y, size, playerNumber, maxHealth, imageName, name);
+    public Unit(World world, double x, double y, double size, double range, int damage, int maxHealth, int playerNumber, double movementSpeed, Entity.Ability[] abilities, String imageName, String name) {
+        super(world, x, y, size, playerNumber, maxHealth, imageName, name);
         this.movementSpeed = movementSpeed;
         this.range = range;
         this.damage = damage;

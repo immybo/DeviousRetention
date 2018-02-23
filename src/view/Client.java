@@ -113,7 +113,7 @@ public class Client {
             return;
         }
 
-        Entity.setNextID(tickObj.nextID);
+        getWorld().setNextEntityID(tickObj.nextID);
 
         tickObj.apply(getWorld());
         getWorld().tick();

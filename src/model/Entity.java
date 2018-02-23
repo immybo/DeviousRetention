@@ -20,8 +20,6 @@ public abstract class Entity implements Serializable {
         GATHER
     }
 
-    private static int nextID = 0;
-
     public final int id;
 
     // Center position
@@ -35,36 +33,26 @@ public abstract class Entity implements Serializable {
 
     private final String name;
 
-    public Entity(double x, double y, double size, String imageName, String name) {
+    public Entity(World world, double x, double y, double size, String imageName, String name) {
         this.x = x;
         this.y = y;
         this.size = size;
 
-        this.id = nextID;
-        nextID++;
+        this.id = world.getNextEntityIDAndIncrement();
 
         this.imageName = imageName;
         this.name = name;
     }
 
-    public Entity(double x, double y, double size, String name) {
+    public Entity(World world, double x, double y, double size, String name) {
         this.x = x;
         this.y = y;
         this.size = size;
 
-        this.id = nextID;
-        nextID++;
+        this.id = world.getNextEntityIDAndIncrement();
 
         this.imageName = null;
         this.name = name;
-    }
-
-    public static void setNextID(int id) {
-        nextID = id;
-    }
-
-    public static int getNextID() {
-        return nextID;
     }
 
     public double getX() {
