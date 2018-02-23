@@ -89,7 +89,7 @@ public abstract class Entity implements Serializable {
         int i = 0;
         boolean colliding = true;
 
-        while (colliding && i <= 15) {
+        while (colliding && i < 10) {
             double newX = getX() + dX;
             if (world.isColliding(this, newX, this.getY())) {
                 colliding = true;
@@ -98,11 +98,12 @@ public abstract class Entity implements Serializable {
             } else {
                 colliding = false;
             }
+            i++;
         }
 
         i = 0;
         colliding = true;
-        while (colliding && i <= 15) {
+        while (colliding && i < 10) {
             double newY = getY() + dY;
             if (world.isColliding(this, this.getX()+dX, newY)) {
                 colliding = true;
@@ -111,6 +112,7 @@ public abstract class Entity implements Serializable {
             } else {
                 colliding = false;
             }
+            i++;
         }
 
         moveBy(dX, dY);

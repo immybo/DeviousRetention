@@ -118,15 +118,18 @@ public class World implements Serializable {
     }
 
     private void groupEntitiesBySquare() {
-        for (int x = 0; x < board.getWidth(); x++) {
-            for (int y = 0; y < board.getHeight(); y++) {
-                entitiesBySquare[y][x] = new HashSet<Entity>();
+        // Synchronized on the entire grid because we don't want to look halfway through updating it
+        synchronized (entitiesBySquare) {
+            for (int x = 0; x < board.getWidth(); x++) {
+                for (int y = 0; y < board.getHeight(); y++) {
+                    entitiesBySquare[y][x] = new HashSet<Entity>();
+                }
             }
-        }
 
-        for (Entity e : entities) {
-            for (Point p : containedTiles(e.getSize(), e.getX(), e.getY())) {
-                entitiesBySquare[p.y][p.x].add(e);
+            for (Entity e : entities) {
+                for (Point p : containedTiles(e.getSize(), e.getX(), e.getY())) {
+                    entitiesBySquare[p.y][p.x].add(e);
+                }
             }
         }
     }
@@ -194,27 +197,30 @@ public class World implements Serializable {
      * if it was at the given x and y coordinates.
      */
     public boolean isColliding(double size, double x, double y) {
-        return isColliding(size, x, y, null);
+        return isColliding(size, x, y, -1);
     }
 
     public boolean isColliding(Entity e, double x, double y) {
-        return isColliding(e.getSize(), x, y, e);
+        return isColliding(e.getSize(), x, y, e.id);
     }
 
-    private boolean isColliding(double size, double x, double y, Entity excluded) {
-        Rectangle.Double bounds = new Rectangle.Double(x-size/2, y-size/2, size, size);
+    private synchronized boolean isColliding(double size, double x, double y, int excludedID) {
+        Rectangle.Double bounds = new Rectangle.Double(x - size / 2, y - size / 2, size, size);
         Point[] containedTiles = containedTiles(size, x, y);
-        for (Point toCheck : containedTiles) {
-            Set<Entity> potentialCollisions = entitiesBySquare[toCheck.y][toCheck.x];
-            for (Entity potentialCollision : potentialCollisions) {
-                if (potentialCollision == excluded) continue;
-                else if (potentialCollision.getBounds().intersects(bounds)) {
+
+        synchronized (entitiesBySquare) {
+            for (Point toCheck : containedTiles) {
+                Set<Entity> potentialCollisions = entitiesBySquare[toCheck.y][toCheck.x];
+                for (Entity potentialCollision : potentialCollisions) {
+                    if (potentialCollision.id == excludedID) continue;
+                    else if (potentialCollision.getBounds().intersects(bounds)) {
+                        return true;
+                    }
+                }
+
+                if (getBoard().getTile(toCheck.x, toCheck.y).collides()) {
                     return true;
                 }
-            }
-
-            if (getBoard().getTile(toCheck.x, toCheck.y).collides()) {
-                return true;
             }
         }
         return false;
