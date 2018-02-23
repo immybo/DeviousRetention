@@ -41,7 +41,7 @@ public class World implements Serializable {
         this.players = new ArrayList<Player>();
         this.nextEntityID = 0;
 
-        entitiesBySquare = new HashSet[board.getHeight()][board.getWidth()];
+        entitiesBySquare = new HashSet[board.getWidth()][board.getHeight()];
     }
 
     public synchronized int getNextEntityIDAndIncrement() {
@@ -122,13 +122,13 @@ public class World implements Serializable {
         synchronized (entitiesBySquare) {
             for (int x = 0; x < board.getWidth(); x++) {
                 for (int y = 0; y < board.getHeight(); y++) {
-                    entitiesBySquare[y][x] = new HashSet<Entity>();
+                    entitiesBySquare[x][y] = new HashSet<Entity>();
                 }
             }
 
             for (Entity e : entities) {
                 for (Point p : containedTiles(e.getSize(), e.getX(), e.getY())) {
-                    entitiesBySquare[p.y][p.x].add(e);
+                    entitiesBySquare[p.x][p.y].add(e);
                 }
             }
         }
@@ -210,7 +210,7 @@ public class World implements Serializable {
 
         synchronized (entitiesBySquare) {
             for (Point toCheck : containedTiles) {
-                Set<Entity> potentialCollisions = entitiesBySquare[toCheck.y][toCheck.x];
+                Set<Entity> potentialCollisions = entitiesBySquare[toCheck.x][toCheck.y];
                 for (Entity potentialCollision : potentialCollisions) {
                     if (potentialCollision.id == excludedID) continue;
                     else if (potentialCollision.getBounds().intersects(bounds)) {
