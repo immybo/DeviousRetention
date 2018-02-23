@@ -14,6 +14,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Robert Campbell on 10/10/2017.
@@ -83,13 +86,8 @@ public class Main {
         server.updateClients();
         world.tick();
 
-        java.util.Timer timer = new java.util.Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                server.tick();
-            }
-        }, 0, TICK_TIME_MS);
+        ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+        timer.scheduleAtFixedRate(()->{server.tick();}, 0, TICK_TIME_MS, TimeUnit.MILLISECONDS);
     }
 
     private static void launchClient(Server server, BuildingTemplate[] buildable) {
