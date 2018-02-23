@@ -28,6 +28,8 @@ public class Unit extends OwnedEntity {
     private int damage;
     private Entity.Ability[] abilities;
 
+    private Thread pathfindingThread;
+
     public Unit(World world, double x, double y, double size, double range, int damage, int maxHealth, int playerNumber, double movementSpeed, Entity.Ability[] abilities, String imageName, String name) {
         super(world, x, y, size, playerNumber, maxHealth, imageName, name);
         this.movementSpeed = movementSpeed;
@@ -35,6 +37,7 @@ public class Unit extends OwnedEntity {
         this.damage = damage;
         this.abilities = abilities;
         this.movePointSteps = new AtomicReference<Point.Double[]>(null);
+        this.pathfindingThread = null;
     }
 
     public boolean can(Entity.Ability doThis) {
@@ -133,38 +136,40 @@ public class Unit extends OwnedEntity {
 
     private void moveTick(World world) {
         // If we haven't done any path finding yet, do it now.
-        if (this.mustRecalculateSteps) {
-            mustRecalculateSteps = false;
+        if (this.mustRecalculateSteps || this.movePointSteps.get() == null) {
+            if (pathfindingThread != null && pathfindingThread.isAlive()) {
+                System.out.println("interrupted thread. (Unit:141)");
+                pathfindingThread.interrupt();
+            }
+
+            this.mustRecalculateSteps = false;
             Unit u = this;
-            new Thread(new Runnable() {
+            pathfindingThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        Point.Double endPoint = world.getNearestEmptyPoint(getSize(), movePoint.x, movePoint.y, 10);
-                        if (endPoint == null) {
-                            movePointSteps.set(new Point.Double[]{movePoint});
-                            return;
-                        }
-                        Point.Double[] path = world.getPath(new Point.Double(getX(), getY()), endPoint, u, getSize() / 2);
-                        if (path == null) {
-                            // We have no path so just try and go straight there
-                            movePointSteps.set(new Point.Double[]{endPoint});
-                        } else {
-                            movePointSteps.set(path);
-                        }
-                        currentMovePointStep = 0;
-                    } catch (NullPointerException e) {
-                        System.out.println();
+                    Point.Double endPoint = world.getNearestEmptyPoint(getSize(), movePoint.x, movePoint.y, 10);
+                    if (endPoint == null) {
+                        movePointSteps.set(new Point.Double[]{movePoint});
+                        return;
                     }
+                    Point.Double[] path = world.getPath(new Point.Double(getX(), getY()), endPoint, u, getSize() / 2);
+                    if (path == null) {
+                        // We have no path so just try and go straight there
+                        movePointSteps.set(new Point.Double[]{endPoint});
+                    } else {
+                        movePointSteps.set(path);
+                    }
+                    currentMovePointStep = 0;
                 }
-            }).start();
-            return;
-        } else if (this.movePointSteps.get() == null) {
+            });
+
+            pathfindingThread.run();
             return;
         }
 
         if (this.currentMovePointStep >= this.movePointSteps.get().length) {
             this.mustRecalculateSteps = true;
+            this.movePoint = null;
             return;
         }
 

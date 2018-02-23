@@ -308,7 +308,11 @@ public class World implements Serializable {
         java.util.Queue<AStarNode> fringe = new PriorityQueue<AStarNode>();
 
         fringe.add(new AStarNode(startPointMiddle, null, 0));
-        while (!fringe.isEmpty()) {
+
+        // We need to stop if the thread is interrupted, because this is often run in a separate thread
+        // which may need to be stopped if this pathfinding is no longer relevant (e.g. if the player
+        // is spam-clicking, or if the unit dies).
+        while (!fringe.isEmpty() && !Thread.interrupted()) {
             AStarNode current = fringe.poll();
             if (visited.contains(current.point)) {
                 continue;
