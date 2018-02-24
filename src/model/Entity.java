@@ -213,7 +213,7 @@ public abstract class Entity implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Entity && o.hashCode() == hashCode();
+        return o instanceof Entity && o.hashCode() == hashCode() && ((Entity)o).id == this.id;
     }
 
     @Override
