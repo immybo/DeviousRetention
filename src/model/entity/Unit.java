@@ -138,7 +138,6 @@ public class Unit extends OwnedEntity {
         // If we haven't done any path finding yet, do it now.
         if (this.mustRecalculateSteps) {
             if (pathfindingThread != null && pathfindingThread.isAlive()) {
-                System.out.println("interrupted thread. (Unit:141)");
                 pathfindingThread.interrupt();
             }
 
@@ -152,7 +151,7 @@ public class Unit extends OwnedEntity {
                         movePointSteps.set(new Point.Double[]{movePoint});
                         return;
                     }
-                    Point.Double[] path = world.getPath(new Point.Double(getX(), getY()), endPoint, u, getSize() / 2);
+                    Point.Double[] path = world.getPath(new Point.Double(getX(), getY()), endPoint, u, -1);
                     if (path == null) {
                         // We have no path so just try and go straight there
                         movePointSteps.set(new Point.Double[]{endPoint});

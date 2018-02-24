@@ -270,7 +270,7 @@ public class World implements Serializable {
      */
     public Point.Double[] getPath(Point.Double startPoint, Point.Double endPoint, Entity entity, double range) {
         if (range == -1) {
-            range = PATHFINDING_GRANULARITY*2;
+            range = PATHFINDING_GRANULARITY;
         }
 
         Point.Double startPointMiddle = new Point.Double((int)startPoint.x + PATHFINDING_GRANULARITY, (int)startPoint.y + PATHFINDING_GRANULARITY);
@@ -344,7 +344,7 @@ public class World implements Serializable {
             for (Point.Double neighbourPoint : neighbourPoints) {
                 if (neighbourPoint.x - entity.getSize()/2 < 0 || neighbourPoint.y - entity.getSize()/2 < 0 || neighbourPoint.x + entity.getSize()/2 >= board.getWidth() || neighbourPoint.y + entity.getSize()/2 >= board.getHeight()) {
                     continue;
-                } else if (isColliding(entity.getSize()+0.2, neighbourPoint.x, neighbourPoint.y)) {
+                } else if (isColliding(entity.getSize()+0.2, neighbourPoint.x, neighbourPoint.y, entity.id)) {
                     continue;
                 } else if (visited.contains(neighbourPoint)) {
                     continue;

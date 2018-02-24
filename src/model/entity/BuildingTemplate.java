@@ -33,7 +33,7 @@ public class BuildingTemplate implements EntityTemplate, Serializable{
     }
 
     @Override
-    public Entity create(World world, int playerNumber, double x, double y) {
+    public Building create(World world, int playerNumber, double x, double y) {
         return new Building(world, x, y, size, playerNumber, maxHealth, trainableUnits, trainTick, name);
     }
 
