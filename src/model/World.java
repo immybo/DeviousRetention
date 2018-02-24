@@ -274,7 +274,7 @@ public class World implements Serializable {
         }
 
         Point.Double startPointMiddle = new Point.Double((int)startPoint.x + PATHFINDING_GRANULARITY, (int)startPoint.y + PATHFINDING_GRANULARITY);
-        Point.Double endPointReal = getNearestEmptyPoint(entity.getSize(), endPoint.x, endPoint.y, 10);
+        Point.Double endPointReal = getNearestEmptyPoint(entity.getSize()+0.2, endPoint.x, endPoint.y, 10);
         if (endPointReal == null) {
             // We couldn't find an empty space, so I guess just don't move anywhere
             return new Point.Double[0];
