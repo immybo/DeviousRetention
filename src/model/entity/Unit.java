@@ -136,7 +136,7 @@ public class Unit extends OwnedEntity {
 
     private void moveTick(World world) {
         // If we haven't done any path finding yet, do it now.
-        if (this.mustRecalculateSteps || this.movePointSteps.get() == null) {
+        if (this.mustRecalculateSteps) {
             if (pathfindingThread != null && pathfindingThread.isAlive()) {
                 System.out.println("interrupted thread. (Unit:141)");
                 pathfindingThread.interrupt();
@@ -165,11 +165,14 @@ public class Unit extends OwnedEntity {
 
             pathfindingThread.run();
             return;
+        } else if (this.movePointSteps.get() == null) {
+            // In this case, we're still recalculating the path in a separate thread.
+            return;
         }
 
         if (this.currentMovePointStep >= this.movePointSteps.get().length) {
-            this.mustRecalculateSteps = true;
             this.movePoint = null;
+            this.movePointSteps.set(null);
             return;
         }
 

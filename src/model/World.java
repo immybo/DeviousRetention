@@ -274,7 +274,7 @@ public class World implements Serializable {
         }
 
         Point.Double startPointMiddle = new Point.Double((int)startPoint.x + PATHFINDING_GRANULARITY, (int)startPoint.y + PATHFINDING_GRANULARITY);
-        Point.Double endPointReal = getNearestEmptyPoint(entity.getSize(), endPoint.x, endPoint.y, 3);
+        Point.Double endPointReal = getNearestEmptyPoint(entity.getSize(), endPoint.x, endPoint.y, 10);
         if (endPointReal == null) {
             // We couldn't find an empty space, so I guess just don't move anywhere
             return new Point.Double[0];
@@ -344,7 +344,7 @@ public class World implements Serializable {
             for (Point.Double neighbourPoint : neighbourPoints) {
                 if (neighbourPoint.x - entity.getSize()/2 < 0 || neighbourPoint.y - entity.getSize()/2 < 0 || neighbourPoint.x + entity.getSize()/2 >= board.getWidth() || neighbourPoint.y + entity.getSize()/2 >= board.getHeight()) {
                     continue;
-                } else if (isColliding(entity, neighbourPoint.x, neighbourPoint.y)) {
+                } else if (isColliding(entity.getSize()+0.2, neighbourPoint.x, neighbourPoint.y)) {
                     continue;
                 } else if (visited.contains(neighbourPoint)) {
                     continue;
