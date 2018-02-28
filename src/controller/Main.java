@@ -13,6 +13,8 @@ import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -106,7 +108,12 @@ public class Main {
             @Override
             public void run() {
                 Client client = new Client(World.NULL_WORLD, player.getPlayerNumber());
-                CTSConnection cts = new CTSConnection(client, player);
+                CTSConnection cts = null;
+                try {
+                    cts = new CTSConnection(client, player, InetAddress.getLocalHost());
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
                 client.setServer(cts);
             }
         });

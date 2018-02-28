@@ -15,6 +15,9 @@ import view.Client;
 import javax.swing.*;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -147,7 +150,12 @@ public class DesyncTest {
             @Override
             public void run() {
                 Client client = new Client(World.NULL_WORLD, player.getPlayerNumber());
-                CTSConnection cts = new CTSConnection(client, player);
+                CTSConnection cts = null;
+                try {
+                    cts = new CTSConnection(client, player, InetAddress.getLocalHost());
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
                 client.setServer(cts);
             }
         });

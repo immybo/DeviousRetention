@@ -24,7 +24,11 @@ public class CTSConnection {
     private Thread listenThread;
     private ObjectOutputStream out;
 
-    public CTSConnection(Client client, Player player) {
+    private final InetAddress ip;
+
+    public CTSConnection(Client client, Player player, InetAddress ip) {
+        this.ip = ip;
+
         this.client = client;
         this.server = null;
         connect(player);
@@ -40,7 +44,7 @@ public class CTSConnection {
 
     public void connect(Player player) {
         try {
-            this.server = new Socket(InetAddress.getByName("localhost"), STCConnection.LISTEN_PORT);
+            this.server = new Socket(ip, STCConnection.LISTEN_PORT);
             out = new ObjectOutputStream(server.getOutputStream());
             send(player);
         } catch (IOException e) {
