@@ -9,17 +9,18 @@ import java.io.Serializable;
 public class BuildingTemplate implements EntityTemplate, Serializable{
     private Entity.Ability[] abilities;
 
-    private double range;
-    private double attackTime;
-    private int damage;
     private double size;
-    private int maxHealth;
     private String name;
-    private Cost cost;
-    private UnitTemplate[] trainableUnits;
-    private int[] trainTick;
 
-    public BuildingTemplate(String name, Entity.Ability[] abilities, double range, double attackTime, int damage, double size, int maxHealth, Cost cost, UnitTemplate[] trainableUnits, int[] trainTick) {
+    public double range;
+    public double attackTime;
+    public int damage;
+    public int maxHealth;
+    public Cost cost;
+    public String[] trainableUnits;
+    public int[] trainTick;
+
+    public BuildingTemplate(String name, Entity.Ability[] abilities, double range, double attackTime, int damage, double size, int maxHealth, Cost cost, String[] trainableUnits, int[] trainTick) {
         this.name = name;
         this.abilities = abilities;
         this.range = range;

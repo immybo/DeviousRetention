@@ -49,13 +49,21 @@ public class Main {
         UnitTemplate infantry = new UnitTemplate("Infantry", new Entity.Ability[]{Entity.Ability.ATTACK}, 0.3, 1, 10, 75, 0.7, 200, new Cost(200), "infantry.png");
         UnitTemplate cavalry = new UnitTemplate("Cavalry", new Entity.Ability[]{Entity.Ability.ATTACK}, 1.5, 1, 10, 75, 1.2, 350, new Cost(600), "cavalry.png");
 
-        BuildingTemplate headquarters = new BuildingTemplate("Headquarters", new Entity.Ability[]{}, 0, 1, 0, 1.5, 5000, new Cost(5000), new UnitTemplate[]{gatherer}, new int[]{10});
-        BuildingTemplate barracks = new BuildingTemplate("Barracks", new Entity.Ability[]{}, 0, 1, 0, 1, 2500, new Cost(2000), new UnitTemplate[]{archer, infantry, cavalry}, new int[]{20, 20, 50});
+        BuildingTemplate headquarters = new BuildingTemplate("Headquarters", new Entity.Ability[]{}, 0, 1, 0, 1.5, 5000, new Cost(5000), new String[]{"Gatherer"}, new int[]{10});
+        BuildingTemplate barracks = new BuildingTemplate("Barracks", new Entity.Ability[]{}, 0, 1, 0, 1, 2500, new Cost(2000), new String[]{"Archer", "Infantry", "Cavalry"}, new int[]{20, 20, 50});
 
         ResourceTemplate bigResource = new ResourceTemplate("Large Gold Mine", 2, 10000, 1);
         ResourceTemplate smallResource = new ResourceTemplate("Small Gold Mine", 1, 1500, 1.5);
 
-        World world = new World(board);
+        EntityTemplate[] allTemplates = new EntityTemplate[] {
+                gatherer, archer, infantry, cavalry, headquarters, barracks, bigResource, smallResource
+        };
+
+        String[] defaultTemplates = new String[]{
+                "Gatherer", "Headquarters"
+        };
+
+        World world = new World(board, allTemplates, defaultTemplates);
 
         int bottom = world.getBoard().getHeight();
         int right = world.getBoard().getWidth();
@@ -91,7 +99,7 @@ public class Main {
     }
 
     private static void launchClient(Server server, BuildingTemplate[] buildable) {
-        Player player = new Player(currentPlayerNumber++, buildable);
+        Player player = new Player(currentPlayerNumber++);
         player.earnCredits(10000);
 
         SwingUtilities.invokeLater(new Runnable() {

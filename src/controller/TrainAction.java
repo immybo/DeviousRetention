@@ -10,26 +10,22 @@ import model.entity.UnitTemplate;
  */
 public class TrainAction extends Action {
     private final int buildingId;
-    public final UnitTemplate unitType;
-    private final Cost cost;
+    public final String unitType;
 
-    public TrainAction(int buildingId, UnitTemplate unitType) {
+    public TrainAction(int buildingId, String unitType) {
         this.buildingId = buildingId;
         this.unitType = unitType;
-        this.cost = unitType.getCost();
     }
 
     @Override
     public void run(World world) {
         Building trainer = (Building)world.getEntityByID(buildingId);
         Player player = world.getPlayer(trainer.getPlayerNumber());
-        if (player.spendCredits(unitType.getCost())) {
-            ((Building)world.getEntityByID(buildingId)).train(unitType);
-        } // Else, failure. Do nothing.
-    }
 
-    @Override
-    public Cost getCost() {
-        return this.cost;
+        UnitTemplate unitTypeTemplate = (UnitTemplate)world.getEntityManager().getEntityTemplateByName(unitType);
+
+        if (player.spendCredits(unitTypeTemplate.getCost())) {
+            ((Building)world.getEntityByID(buildingId)).train(unitTypeTemplate);
+        } // Else, failure. Do nothing.
     }
 }

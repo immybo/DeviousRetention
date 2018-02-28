@@ -6,6 +6,7 @@ import model.Entity;
 import model.Player;
 import model.World;
 import model.entity.*;
+import model.technology.TestTechnology;
 import network.CTSConnection;
 import util.CoordinateTranslation;
 
@@ -144,15 +145,18 @@ public class Client {
             // Sometimes we don't have a player object yet, because the server has only just sent the world
             Player player = getWorld().getPlayer(playerNumber);
             if (player != null) {
-                for (BuildingTemplate bt : player.getBuildable()) {
-                    JButton buildButton = new JButton(bt.getName());
-                    buildButton.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            gamePanel.setPlacingBuilding(bt);
-                        }
-                    });
-                    buildingsPanel.add(buildButton);
+                for (EntityTemplate et : getWorld().getEntityManager().getTemplatesForPlayer(getWorld().getPlayer(getPlayerNumber())).values()) {
+                    if (et instanceof BuildingTemplate) {
+                        BuildingTemplate bt = (BuildingTemplate)et;
+                        JButton buildButton = new JButton(bt.getName());
+                        buildButton.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                gamePanel.setPlacingBuilding(bt);
+                            }
+                        });
+                        buildingsPanel.add(buildButton);
+                    }
                 }
             }
             frame.validate();
@@ -224,11 +228,17 @@ public class Client {
                         Building selectedB = (Building)selected;
                         if (selectedB.getPlayerNumber() == playerNumber) {
                             try {
-                                UnitTemplate toTrain = selectedB.trainableUnits()[0];
+                                Player p = getWorld().getPlayer(getPlayerNumber());
+                                String toTrainName = selectedB.trainableUnits()[0];
+                                UnitTemplate toTrain = (UnitTemplate)world.get().getEntityManager().getEntityTemplateByName(toTrainName);
+                                if (!getWorld().getEntityManager().isEnabled(p, toTrainName)) {
+                                    return;
+                                }
+
                                 // This isn't a foolproof check, so we have to check serverside before doing the action as well.
                                 // But, it means we can easily show them a failure message client side *most* of the time.
                                 if (getWorld().getPlayer(playerNumber).getNumCredits() >= toTrain.getCost().creditCost) {
-                                    server.send(new TrainAction(id, toTrain));
+                                    server.send(new TrainAction(id, toTrainName));
                                 } else {
                                     // Show not enough credits to user TODO
                                 }

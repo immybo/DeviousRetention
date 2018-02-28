@@ -2,6 +2,8 @@ package model;
 
 import controller.Action;
 import controller.TickObject;
+import model.entity.EntityManager;
+import model.entity.EntityTemplate;
 import model.tile.GrassTile;
 import util.CoordinateTranslation;
 
@@ -17,7 +19,7 @@ import java.util.List;
 public class World implements Serializable {
     public static final double PATHFINDING_GRANULARITY = 0.25;
 
-    public static final World NULL_WORLD = new World(new Board(new Tile[][]{new Tile[]{new GrassTile()}}));
+    public static final World NULL_WORLD = new World(new Board(new Tile[][]{new Tile[]{new GrassTile()}}), new EntityTemplate[0], new String[0]);
 
     private final Board board;
     private List<Entity> entities;
@@ -29,17 +31,23 @@ public class World implements Serializable {
 
     private Set<Entity>[][] entitiesBySquare;
 
+    private EntityManager entityManager;
+
+    private Technology toApplyTechnology = null;
+
     // It would be better to store this as a static variable in Entity, but this obviously
     // causes issues when running a client and a server in the same process
     private int nextEntityID;
 
-    public World(Board board) {
+    public World(Board board, EntityTemplate[] allTemplates, String[] defaultTemplates) {
         this.board = board;
         this.entities = new ArrayList<Entity>();
         this.entitiesToAdd = new ArrayList<Entity>();
         this.entitiesToRemove = new ArrayList<Integer>();
         this.players = new ArrayList<Player>();
         this.nextEntityID = 0;
+
+        this.entityManager = new EntityManager(allTemplates, defaultTemplates);
 
         entitiesBySquare = new HashSet[board.getWidth()][board.getHeight()];
     }
@@ -58,7 +66,9 @@ public class World implements Serializable {
 
     public void addPlayer(Player player) {
         players.add(player);
+        entityManager.addPlayer(player);
     }
+
     public Player getPlayer(int playerNumber) {
         for (Player p : players) {
             if (p.getPlayerNumber() == playerNumber) {
@@ -71,7 +81,10 @@ public class World implements Serializable {
         return players.toArray(new Player[0]);
     }
     public void setPlayers(Player[] players) {
-        this.players = Arrays.asList(players);
+        this.players.clear();
+        for (Player p : players) {
+            addPlayer(p);
+        }
     }
 
     public void addEntity(Entity entity) {
@@ -112,9 +125,25 @@ public class World implements Serializable {
 
         groupEntitiesBySquare();
 
+        if (toApplyTechnology != null) {
+            Player p = getPlayer(toApplyTechnology.getPlayerNumber());
+            getEntityManager().enableTemplates(p, toApplyTechnology.getEntityUnlocks());
+            toApplyTechnology.applyToTemplates(getEntityManager().getTemplatesForPlayer(p));
+            toApplyTechnology.apply(p, this);
+            toApplyTechnology = null;
+        }
+
         for (Entity e : entities) {
             e.tick(this);
         }
+    }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    public void applyTechnology(Technology tech) {
+        toApplyTechnology = tech;
     }
 
     private void groupEntitiesBySquare() {

@@ -2,10 +2,7 @@ package test;
 
 import controller.Cost;
 import controller.MoveAction;
-import model.entity.Building;
-import model.entity.BuildingTemplate;
-import model.entity.Unit;
-import model.entity.UnitTemplate;
+import model.entity.*;
 import model.tile.GrassTile;
 import model.tile.MountainTile;
 import org.junit.Assert;
@@ -22,6 +19,9 @@ public class PathfindingTest {
 
     private static UnitTemplate testUnit;
     private static BuildingTemplate testBuilding;
+
+    private static EntityTemplate[] allTemplates;
+    private static String[] defaultTemplates;
 
     private World world;
 
@@ -42,12 +42,16 @@ public class PathfindingTest {
         board = new Board(tiles);
 
         testUnit = new UnitTemplate("TestUnit", new Entity.Ability[]{Entity.Ability.ATTACK, Entity.Ability.GATHER}, 1, 1, 1, 1, 1, 1, new Cost(1), null);
-        testBuilding = new BuildingTemplate("TestBuilding", new Entity.Ability[]{Entity.Ability.ATTACK}, 5, 1, 1, 3, 1, new Cost(1), new UnitTemplate[]{testUnit}, new int[]{1});
+        testBuilding = new BuildingTemplate("TestBuilding", new Entity.Ability[]{Entity.Ability.ATTACK}, 5, 1, 1, 3, 1, new Cost(1), new String[]{"TestUnit"}, new int[]{1});
+
+        allTemplates = new EntityTemplate[]{testUnit, testBuilding};
+        defaultTemplates = new String[]{"TestUnit", "TestBuilding"};
     }
 
     @Before
     public void setUp() {
-        world = new World(board);
+        world = new World(board, allTemplates, defaultTemplates);
+        EntityManager em = world.getEntityManager();
     }
 
     @Test

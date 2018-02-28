@@ -13,13 +13,13 @@ import java.util.*;
  * new technologies.
  */
 public class Building extends OwnedEntity {
-    private final UnitTemplate[] trainableUnits;
+    private final String[] trainableUnits;
     private final int[] trainTicks;
 
     private int currentTrainTick;
     private Queue<UnitTemplate> trainQueue;
 
-    public Building(World world, double x, double y, double size, int playerNumber, int maxHealth, UnitTemplate[] trainableUnits, int[] trainTicks, String name) {
+    public Building(World world, double x, double y, double size, int playerNumber, int maxHealth, String[] trainableUnits, int[] trainTicks, String name) {
         super(world, x, y, size, playerNumber, maxHealth, name);
 
         this.trainableUnits = trainableUnits;
@@ -29,13 +29,13 @@ public class Building extends OwnedEntity {
         trainQueue = new LinkedList<UnitTemplate>();
     }
 
-    public UnitTemplate[] trainableUnits() {
+    public String[] trainableUnits() {
         return trainableUnits;
     }
 
     public boolean canTrain(UnitTemplate unit) {
-        for (UnitTemplate u : trainableUnits()) {
-            if (u.getName().equals(unit.getName())) {
+        for (String uName : trainableUnits()) {
+            if (uName.equals(unit.getName())) {
                 return true;
             }
         }
@@ -44,7 +44,7 @@ public class Building extends OwnedEntity {
 
     private int ticksToTrain(UnitTemplate unit) {
         for (int i = 0; i < trainableUnits.length; i++) {
-            if (trainableUnits[i].getName().equals(unit.getName())) {
+            if (trainableUnits[i].equals(unit.getName())) {
                 return trainTicks[i];
             }
         }
@@ -83,8 +83,7 @@ public class Building extends OwnedEntity {
     public Action[] getActions() {
         Action[] actions = new Action[trainableUnits.length];
         for (int i = 0; i < actions.length; i++) {
-            UnitTemplate u = trainableUnits[i];
-            actions[i] = new TrainAction(id, u);
+            actions[i] = new TrainAction(id, trainableUnits[i]);
         }
         return actions;
     }

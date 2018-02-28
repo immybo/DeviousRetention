@@ -15,7 +15,7 @@ public class ActionButton extends JButton {
 
         this.addActionListener((ae)->server.send(a));
         if (a instanceof TrainAction) {
-            this.setText("Train " + ((TrainAction)a).unitType.getName());
+            this.setText("Train " + ((TrainAction)a).unitType);
         } else {
             this.setText("Unknown action");
         }

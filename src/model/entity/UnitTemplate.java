@@ -14,15 +14,16 @@ public class UnitTemplate implements EntityTemplate, Serializable {
 
     private Entity.Ability[] abilities;
 
-    private double movementSpeed;
-    private double range;
-    private double attackTime;
-    private int damage;
     private double size;
-    private int maxHealth;
     private String name;
-    private Cost cost;
-    private String imageName;
+
+    public double movementSpeed;
+    public double range;
+    public double attackTime;
+    public int damage;
+    public int maxHealth;
+    public Cost cost;
+    public String imageName;
 
     public UnitTemplate(String name, Entity.Ability[] abilities, double movementSpeed, double range, double attackTime, int damage, double size, int maxHealth, Cost cost, String imageName) {
         this.name = name;

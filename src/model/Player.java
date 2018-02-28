@@ -20,16 +20,14 @@ public class Player implements Serializable {
     private final int playerNumber;
     private final Color playerColor;
     private int numCredits;
-    private final BuildingTemplate[] buildable;
 
-    public Player(int playerNumber, BuildingTemplate[] buildable) {
+    public Player(int playerNumber) {
         if (playerNumber < 0 || playerNumber >= playerColors.length) {
             throw new IllegalArgumentException("Player number of " + playerNumber + " not allowed; must be >0 and <" + playerColors.length);
         }
 
         this.playerNumber = playerNumber;
         this.playerColor = playerColors[playerNumber];
-        this.buildable = buildable;
     }
 
     public int getPlayerNumber() {
@@ -63,9 +61,5 @@ public class Player implements Serializable {
 
     public void spendCreditsNoCheck(int num) {
         numCredits -= num;
-    }
-
-    public BuildingTemplate[] getBuildable() {
-        return buildable;
     }
 }

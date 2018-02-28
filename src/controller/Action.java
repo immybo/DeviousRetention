@@ -9,8 +9,4 @@ import java.io.Serializable;
  */
 public abstract class Action implements Serializable {
     public abstract void run(World world);
-
-    public Cost getCost() {
-        return new Cost(0);
-    }
 }

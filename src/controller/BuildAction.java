@@ -30,9 +30,4 @@ public class BuildAction extends Action {
             world.addEntity(buildingType.create(world, playerNumber, x, y));
         }
     }
-
-    @Override
-    public Cost getCost() {
-        return this.cost;
-    }
 }

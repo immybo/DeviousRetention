@@ -29,6 +29,9 @@ public class Server {
     private World world;
 
     private long tickNumber;
+    private boolean mustUpdateClients;
+    private boolean mustResetClients;
+    private TickObject resetClientsTick;
 
     private List<Action> actionQueue;
 
@@ -38,6 +41,8 @@ public class Server {
         this.world = world;
         this.actionQueue = Collections.synchronizedList(new ArrayList<Action>());
         this.listenThread = null;
+        this.mustUpdateClients = false;
+        this.mustResetClients = false;
 
         Runnable listenRun = new Runnable() {
             public void run() {
@@ -81,16 +86,28 @@ public class Server {
     }
 
     public void tick() {
-        Action[] toApply = pollActions();
-        TickObject tickObj = new TickObject(tickNumber, toApply, getWorld().hashCode(), false, getWorld().getNextEntityID());
-        tickNumber++;
+        if (mustResetClients) {
+            for (STCConnection client : clients) {
+                client.send(resetClientsTick);
+            }
+            mustResetClients = false;
+        } else {
+            Action[] toApply = pollActions();
+            TickObject tickObj = new TickObject(tickNumber, toApply, getWorld().hashCode(), false, getWorld().getNextEntityID());
+            tickNumber++;
 
-        for (STCConnection client : clients) {
-            client.send(tickObj);
+            for (STCConnection client : clients) {
+                client.send(tickObj);
+            }
+
+            tickObj.apply(world);
+            world.tick();
         }
 
-        tickObj.apply(world);
-        world.tick();
+        if (mustUpdateClients) {
+            updateClientsActual();
+            mustUpdateClients = false;
+        }
     }
 
     /**
@@ -114,7 +131,6 @@ public class Server {
 
     public void addClient(STCConnection connection) {
         clients.add(connection);
-        connection.send(getWorld());
     }
 
     public World getWorld() {
@@ -123,9 +139,20 @@ public class Server {
 
     public void addPlayer(Player player) {
         world.addPlayer(player);
+        sendPlayerToClients(player);
+    }
+
+    private void sendPlayerToClients(Player p) {
+        for (STCConnection c : clients) {
+            c.send(world.getPlayers());
+        }
     }
 
     public void updateClients() {
+        mustUpdateClients = true;
+    }
+
+    private void updateClientsActual() {
         if (world != null) {
             for (STCConnection client : clients) {
                 client.send(world.getEntities());
@@ -135,8 +162,7 @@ public class Server {
     }
 
     public void resetClientsToTick(long tickNumber) {
-        for (STCConnection client : clients) {
-            client.send(new TickObject(tickNumber, new Action[0], getWorld().hashCode(), true, getWorld().getNextEntityID()));
-        }
+        mustResetClients = true;
+        resetClientsTick = new TickObject(tickNumber, new Action[0], getWorld().hashCode(), true, getWorld().getNextEntityID());
     }
 }
