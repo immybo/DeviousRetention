@@ -94,7 +94,6 @@ public class Server {
         } else {
             Action[] toApply = pollActions();
             TickObject tickObj = new TickObject(tickNumber, toApply, getWorld().hashCode(), false, getWorld().getNextEntityID());
-            tickNumber++;
 
             for (STCConnection client : clients) {
                 client.send(tickObj);
@@ -103,6 +102,8 @@ public class Server {
             tickObj.apply(world);
             world.tick();
         }
+
+        tickNumber++;
 
         if (mustUpdateClients) {
             updateClientsActual();
@@ -121,12 +122,15 @@ public class Server {
             resetClientsToTick(tickNumber);
         }
 
+        // We now check the hash client-side
+        /*
         int serverHash = getWorld().hashCode();
         if (hash != serverHash) {
             System.out.println("Out of sync; client hash of " + hash + " != server hash of " + serverHash);
             updateClients();
             resetClientsToTick(tickNumber);
         }
+        */
     }
 
     public void addClient(STCConnection connection) {

@@ -133,7 +133,10 @@ public class DesyncTest {
         }
 
         outStr = out.toString().split("\n");
-        Assert.assertTrue(outStr.length == 0);
+
+        System.out.println(outStr);
+
+        Assert.assertTrue(outStr.length == 1);
     }
 
     private static void launchClient(int number) {
