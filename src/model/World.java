@@ -4,6 +4,7 @@ import controller.Action;
 import controller.TickObject;
 import model.entity.EntityManager;
 import model.entity.EntityTemplate;
+import model.entity.OwnedEntity;
 import model.tile.GrassTile;
 import util.CoordinateTranslation;
 
@@ -95,6 +96,18 @@ public class World implements Serializable {
 
     public Entity[] getEntities() {
         return entities.toArray(new Entity[0]);
+    }
+
+    public Entity[] getEntitiesByPlayer(int playerNumber) {
+        List<Entity> playerEntities = new ArrayList<Entity>();
+        for (Entity e : entities) {
+            if (e instanceof OwnedEntity) {
+                if (((OwnedEntity)e).getPlayerNumber() == playerNumber) {
+                    playerEntities.add(e);
+                }
+            }
+        }
+        return playerEntities.toArray(new Entity[0]);
     }
 
     public Board getBoard() {

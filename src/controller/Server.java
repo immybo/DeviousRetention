@@ -86,6 +86,24 @@ public class Server {
     }
 
     public void tick() {
+        List<Integer> alivePlayers = new ArrayList<Integer>();
+        for (Player p : getWorld().getPlayers()) {
+            if (getWorld().getEntitiesByPlayer(p.getPlayerNumber()).length == 0) {
+                // This player loses!
+                for (STCConnection client : clients) {
+                    client.send(new GameStateChange(GameStateChange.Type.LOSE, p.getPlayerNumber()));
+                }
+            } else {
+                alivePlayers.add(p.getPlayerNumber());
+            }
+        }
+
+        if (alivePlayers.size() == 1 && getWorld().getPlayers().length > 1) {
+            for (STCConnection client : clients) {
+                client.send(new GameStateChange(GameStateChange.Type.WIN, alivePlayers.get(0)));
+            }
+        }
+
         if (mustResetClients) {
             for (STCConnection client : clients) {
                 client.send(resetClientsTick);

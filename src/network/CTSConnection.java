@@ -1,6 +1,7 @@
 package network;
 
 import controller.Action;
+import controller.GameStateChange;
 import controller.TickObject;
 import model.Entity;
 import model.Player;
@@ -26,8 +27,14 @@ public class CTSConnection {
 
     private final InetAddress ip;
 
+    private boolean isDead;
+    private boolean isClosed;
+
     public CTSConnection(Client client, Player player, InetAddress ip) {
         this.ip = ip;
+
+        this.isDead = false;
+        this.isClosed = false;
 
         this.client = client;
         this.server = null;
@@ -63,6 +70,16 @@ public class CTSConnection {
         }
 
         while (!server.isClosed()) {
+            if (isClosed) {
+                try {
+                    server.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+            }
+
             try {
                 Object in = input.readObject();
                 if (in instanceof World) {
@@ -93,6 +110,15 @@ public class CTSConnection {
                             client.handleServerTick((TickObject)in);
                         }
                     });
+                } else if (in instanceof GameStateChange) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isDead) {
+                                client.handleGameStateChange((GameStateChange) in);
+                            }
+                        }
+                    });
                 }
             } catch (IOException|ClassNotFoundException e) {
                 System.err.println("couldn't read object from client: " + e);
@@ -102,6 +128,10 @@ public class CTSConnection {
     }
 
     public void send(Object o) {
+        if (this.isDead || this.isClosed) {
+            return;
+        }
+
         try {
             out.writeObject(o);
             out.flush();
@@ -109,5 +139,13 @@ public class CTSConnection {
         } catch (IOException e) {
             System.err.println("unable to send object to server: " + e);
         }
+    }
+
+    public void setDead() {
+        this.isDead = true;
+    }
+
+    public void close() {
+        this.isClosed = true;
     }
 }

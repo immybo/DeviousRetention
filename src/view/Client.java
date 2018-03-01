@@ -196,6 +196,19 @@ public class Client {
         return selectedIds.toArray(new Integer[0]);
     }
 
+    public void handleGameStateChange(GameStateChange change) {
+        if (change.playerNumber == this.getPlayerNumber()) {
+            server.setDead();
+            if (change.type == GameStateChange.Type.WIN) {
+                JOptionPane.showMessageDialog(this.frame, "All other players are dead. You win!", "", JOptionPane.PLAIN_MESSAGE);
+            } else if (change.type == GameStateChange.Type.LOSE) {
+                JOptionPane.showMessageDialog(this.frame, "You lose!", "", JOptionPane.PLAIN_MESSAGE);
+            }
+        } else if (change.type == GameStateChange.Type.WIN) {
+            server.close();
+        }
+    }
+
     /**
      * Key listener for the entire client. We want this to apply to the entire client since
      * the focus may not be on any individual element of it.
